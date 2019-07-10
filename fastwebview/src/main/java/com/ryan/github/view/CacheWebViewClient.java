@@ -1,4 +1,4 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import android.graphics.Bitmap;
 import android.net.http.SslError;
@@ -21,8 +21,8 @@ import android.webkit.WebViewClient;
  * 实现缓存拦截
  * 完全代理外部使用的WebViewClient对象
  *
- * @author shamschu
- * @Date 2018/2/7 下午3:39
+ * @author Ryan
+ * create by 2018/2/7 下午3:39
  */
 class CacheWebViewClient extends WebViewClient {
 

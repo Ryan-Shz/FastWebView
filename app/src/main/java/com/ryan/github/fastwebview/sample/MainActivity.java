@@ -1,7 +1,9 @@
-package com.sc.github.view;
+package com.ryan.github.fastwebview.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.ryan.github.view.FastWebView;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,10 +1,10 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import java.io.InputStream;
 
 /**
- * @author shamschu
- * @Date 2018/2/7 下午7:37
+ * @author Ryan
+ * create by 2018/2/7 下午7:37
  */
 public class MemoryResource {
 

@@ -1,12 +1,12 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import java.util.Map;
 
 /**
  * 远程请求配置职责
  *
- * @author shamschu
- * @Date 2018/2/11 上午10:50
+ * @author Ryan
+ * create by 2018/2/11 上午10:50
  */
 public interface IRemoteRequestConfig {
 

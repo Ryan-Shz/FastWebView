@@ -1,10 +1,10 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 /**
  * 静态资源过滤器
  *
- * @author shamschu
- * @Date 2018/2/11 下午2:56
+ * @author Ryan
+ * create by 2018/2/11 下午2:56
  */
 public interface IExtensionFilter {
 

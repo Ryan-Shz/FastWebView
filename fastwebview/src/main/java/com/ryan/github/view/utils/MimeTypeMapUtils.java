@@ -1,4 +1,4 @@
-package com.sc.github.view.utils;
+package com.ryan.github.view.utils;
 
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;

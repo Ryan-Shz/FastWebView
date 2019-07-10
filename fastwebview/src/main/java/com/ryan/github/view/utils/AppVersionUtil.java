@@ -1,12 +1,12 @@
-package com.sc.github.view.utils;
+package com.ryan.github.view.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 /**
- * @author shamschu
- * @Date 2018/2/7 下午6:20
+ * @author Ryan
+ * create by 2018/2/7 下午6:20
  */
 public class AppVersionUtil {
 

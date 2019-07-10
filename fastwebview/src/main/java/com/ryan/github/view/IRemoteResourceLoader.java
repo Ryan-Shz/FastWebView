@@ -1,8 +1,8 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 /**
- * @author shamschu
- * @Date 2018/2/7 下午7:53
+ * @author Ryan
+ * create by 2018/2/7 下午7:53
  */
 public interface IRemoteResourceLoader {
 

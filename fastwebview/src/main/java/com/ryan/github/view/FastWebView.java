@@ -1,4 +1,4 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,13 +11,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.sc.github.view.utils.NetworkUtils;
+import com.ryan.github.view.utils.NetworkUtils;
 
 import java.util.Map;
 
 /**
- * @author shamschu
- * @Date 2018/2/7 下午3:33
+ * @author Ryan
+ * create by 2018/2/7 下午3:33
  */
 public class FastWebView extends WebView {
 

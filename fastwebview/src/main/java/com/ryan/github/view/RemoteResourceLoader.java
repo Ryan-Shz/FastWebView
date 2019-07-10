@@ -1,4 +1,4 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import android.util.Log;
 
@@ -14,8 +14,8 @@ import java.util.Map;
  * 使用HttpUrlConnection下载静态资源
  * 如下载请求的是初始网址，或获取返回头部
  *
- * @author shamschu
- * @Date 2018/2/7 下午7:55
+ * @author Ryan
+ * create by 2018/2/7 下午7:55
  */
 public class RemoteResourceLoader implements IRemoteResourceLoader, IRemoteRequestConfig {
 

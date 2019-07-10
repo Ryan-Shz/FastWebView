@@ -1,4 +1,4 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,8 +6,8 @@ import java.util.Set;
 /**
  * 磁盘存储过滤器
  *
- * @author shamschu
- * @Date 2018/2/11 下午3:16
+ * @author Ryan
+ * create by 2018/2/11 下午3:16
  */
 public class ExtensionFilter implements IExtensionFilter {
 

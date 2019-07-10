@@ -1,12 +1,12 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author shamschu
- * @Date 2018/3/1 下午5:40
+ * @author Ryan
+ * create by 2018/3/1 下午5:40
  */
 public class RemoteResource {
 

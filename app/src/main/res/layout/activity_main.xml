@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="com.sc.github.view.MainActivity">
 
-    <com.sc.github.view.FastWebView
+    <com.ryan.github.view.FastWebView
         android:id="@+id/fast_web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

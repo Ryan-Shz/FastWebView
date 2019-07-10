@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sc.github.view.lru;
+package com.ryan.github.view.lru;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;

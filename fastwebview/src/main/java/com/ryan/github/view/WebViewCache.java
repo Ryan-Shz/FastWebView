@@ -1,4 +1,4 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import android.content.Context;
 import android.support.v4.util.LruCache;
@@ -6,11 +6,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
 
-import com.sc.github.view.lru.DiskLruCache;
-import com.sc.github.view.utils.AppVersionUtil;
-import com.sc.github.view.utils.InputStreamUtils;
-import com.sc.github.view.utils.MD5Utils;
-import com.sc.github.view.utils.MimeTypeMapUtils;
+import com.ryan.github.view.lru.DiskLruCache;
+import com.ryan.github.view.utils.AppVersionUtil;
+import com.ryan.github.view.utils.InputStreamUtils;
+import com.ryan.github.view.utils.MD5Utils;
+import com.ryan.github.view.utils.MimeTypeMapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +22,8 @@ import java.util.Map;
 /**
  * WebView缓存实现类
  *
- * @author shamschu
- * @Date 2018/2/7 下午5:07
+ * @author Ryan
+ * create by 2018/2/7 下午5:07
  */
 public class WebViewCache implements IWebViewCache, IRemoteRequestConfig {
 

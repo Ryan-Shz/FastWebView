@@ -1,12 +1,12 @@
-package com.sc.github.view;
+package com.ryan.github.view;
 
 import android.webkit.WebResourceResponse;
 
 /**
  * WebView缓存职责
  *
- * @author shamschu
- * @Date 2018/2/7 下午5:06
+ * @author Ryan
+ * create by 2018/2/7 下午5:06
  */
 public interface IWebViewCache {
 
