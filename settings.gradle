@@ -1,1 +1,1 @@
-include ':app', ':fastwebview', ':fastwebview'
+include ':app', ':cachedwebview', ':fastwebview'
