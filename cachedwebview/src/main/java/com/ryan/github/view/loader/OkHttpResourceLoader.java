@@ -1,6 +1,7 @@
 package com.ryan.github.view.loader;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientHolder;
@@ -22,6 +23,7 @@ import okhttp3.ResponseBody;
  */
 public class OkHttpResourceLoader implements ResourceLoader {
 
+    private static final String USER_AGENT = "User-Agent";
     private Context mContext;
 
     public OkHttpResourceLoader(Context context) {
@@ -31,36 +33,42 @@ public class OkHttpResourceLoader implements ResourceLoader {
     @Override
     public WebResource getResource(SourceRequest sourceRequest) {
         String url = sourceRequest.getUrl();
-        boolean isCache = sourceRequest.isCacheable();
+        boolean isCacheByOkHttp = sourceRequest.isCacheable();
         OkHttpClient client = OkHttpClientHolder.get(mContext);
         CacheControl.Builder builder = new CacheControl.Builder();
-        if (!isCache) {
+        if (!isCacheByOkHttp) {
             builder.noStore();
         }
-        Request.Builder requestBuilder = new Request.Builder();
+        String userAgent = sourceRequest.getUserAgent();
+        if (TextUtils.isEmpty(userAgent)) {
+            userAgent = "Android";
+        }
+        Request.Builder requestBuilder = new Request.Builder()
+                .removeHeader(USER_AGENT)
+                .addHeader(USER_AGENT, userAgent);
         Map<String, String> headers = sourceRequest.getHeaders();
         if (headers != null && !headers.isEmpty()) {
-            requestBuilder.headers(Headers.of(headers));
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                requestBuilder.removeHeader(entry.getKey());
+                requestBuilder.addHeader(entry.getKey(), entry.getValue());
+            }
         }
         Request request = requestBuilder
                 .url(url)
-                .get()
                 .cacheControl(builder.build())
+                .get()
                 .build();
         Response response;
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
-            if (response.code() == 304) {
-                remoteResource.setModified(false);
-                return remoteResource;
-            }
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 InputStream is = responseBody.byteStream();
-                remoteResource.setModified(true);
+                remoteResource.setModified(response.code() != 304);
                 remoteResource.setInputStream(is);
                 remoteResource.setResponseHeaders(response.headers().toMultimap());
+                remoteResource.setCache(!isCacheByOkHttp);
                 return remoteResource;
             }
         } catch (IOException e) {

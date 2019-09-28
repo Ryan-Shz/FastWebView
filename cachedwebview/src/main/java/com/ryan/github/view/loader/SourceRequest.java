@@ -11,6 +11,7 @@ public class SourceRequest {
     private String url;
     private boolean cacheable;
     private Map<String, String> headers;
+    private String userAgent;
 
     public SourceRequest(String url) {
         this.url = url;
@@ -40,6 +41,14 @@ public class SourceRequest {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
     }
 
     public Map<String, String> getHeaders() {

@@ -1,6 +1,6 @@
 package com.ryan.github.view.offline;
 
-import android.webkit.WebResourceResponse;
+import com.ryan.github.view.WebResource;
 
 import java.util.List;
 
@@ -18,9 +18,12 @@ public class Chain {
         mInterceptors = interceptors;
     }
 
-    public WebResourceResponse process(CacheRequest request) {
+    public WebResource process(CacheRequest request) {
+        if (++mIndex >= mInterceptors.size()) {
+            return null;
+        }
         mRequest = request;
-        ResourceInterceptor interceptor = mInterceptors.get(++mIndex);
+        ResourceInterceptor interceptor = mInterceptors.get(mIndex);
         return interceptor.load(this);
     }
 

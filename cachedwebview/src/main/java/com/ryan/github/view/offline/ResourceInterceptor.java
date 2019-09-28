@@ -1,6 +1,6 @@
 package com.ryan.github.view.offline;
 
-import android.webkit.WebResourceResponse;
+import com.ryan.github.view.WebResource;
 
 /**
  * Created by Ryan
@@ -8,6 +8,6 @@ import android.webkit.WebResourceResponse;
  */
 public interface ResourceInterceptor {
 
-    WebResourceResponse load(Chain chain);
+    WebResource load(Chain chain);
 
 }

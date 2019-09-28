@@ -1,10 +1,9 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
-import android.webkit.WebResourceResponse;
 
+import com.ryan.github.view.WebResource;
 import com.ryan.github.view.utils.AppVersionUtil;
-import com.ryan.github.view.utils.InputStreamUtils;
 import com.ryan.github.view.lru.DiskLruCache;
 import com.ryan.github.view.CacheConfig;
 import com.ryan.github.view.utils.MD5Utils;
@@ -19,7 +18,7 @@ import java.net.URLEncoder;
  * Created by Ryan
  * at 2019/9/27
  */
-public class DiskResourceInterceptor extends BaseResourceInterceptor implements Destroyable {
+public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor {
 
     private static final String CACHE_DIR_NAME = "cached_webview_force";
     private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
@@ -78,19 +77,21 @@ public class DiskResourceInterceptor extends BaseResourceInterceptor implements 
     }
 
     @Override
-    public WebResourceResponse load(Chain chain) {
+    public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
         ensureDiskLruCacheCreate();
         InputStream ins = getFromDiskCache(request.getUrl());
-        WebResourceResponse response = createWebResourceResponse(ins, request.getMime());
-        if (response != null) {
-            return response;
+        if (ins != null) {
+            WebResource webResource = new WebResource();
+            webResource.setInputStream(ins);
+            webResource.setModified(false);
+            return webResource;
         }
-        response = chain.process(request);
-        if (response != null) {
-            cacheToDisk(request.getUrl(), response.getData());
+        WebResource resource = chain.process(request);
+        if (resource != null && resource.isCache()) {
+            cacheToDisk(request.getUrl(), resource.getInputStream());
         }
-        return response;
+        return resource;
     }
 
     @Override

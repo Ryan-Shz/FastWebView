@@ -1,7 +1,6 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
-import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.CacheConfig;
 import com.ryan.github.view.DefaultExtensionFilter;
@@ -15,7 +14,7 @@ import com.ryan.github.view.loader.SourceRequest;
  * Created by Ryan
  * at 2019/9/27
  */
-public class ForceRemoteResourceInterceptor extends BaseResourceInterceptor implements Destroyable {
+public class ForceRemoteResourceInterceptor implements Destroyable, ResourceInterceptor {
 
     private ResourceLoader mResourceLoader;
     private ExtensionFilter mExtensionFilter;
@@ -29,14 +28,14 @@ public class ForceRemoteResourceInterceptor extends BaseResourceInterceptor impl
     }
 
     @Override
-    public WebResourceResponse load(Chain chain) {
+    public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
         boolean isFilter = mExtensionFilter.isFilter(request.getExtension());
         SourceRequest sourceRequest = new SourceRequest(request.getUrl(), isFilter, request.getHeaders());
+        sourceRequest.setUserAgent(request.getUserAgent());
         WebResource resource = mResourceLoader.getResource(sourceRequest);
-        WebResourceResponse response = generateWebResourceResponse(resource, request.getMime());
-        if (response != null) {
-            return response;
+        if (resource != null) {
+            return resource;
         }
         return chain.process(request);
     }

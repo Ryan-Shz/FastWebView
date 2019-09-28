@@ -18,6 +18,8 @@ public class WebResource {
 
     private boolean isModified = true;
 
+    private boolean isCache = false;
+
     public void setModified(boolean modified) {
         isModified = modified;
     }
@@ -40,5 +42,13 @@ public class WebResource {
 
     public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
         this.responseHeaders = responseHeaders;
+    }
+
+    public void setCache(boolean cache) {
+        isCache = cache;
+    }
+
+    public boolean isCache() {
+        return isCache;
     }
 }

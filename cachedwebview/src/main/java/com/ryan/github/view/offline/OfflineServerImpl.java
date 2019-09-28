@@ -1,10 +1,13 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.CacheConfig;
+import com.ryan.github.view.WebResource;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,9 @@ public class OfflineServerImpl implements OfflineServer {
     private synchronized List<ResourceInterceptor> buildForceModeChain(Context context, CacheConfig cacheConfig) {
         if (mForceModeChainList == null) {
             List<ResourceInterceptor> interceptors = new ArrayList<>();
-            interceptors.addAll(mBaseInterceptorList);
+            if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
+                interceptors.addAll(mBaseInterceptorList);
+            }
             interceptors.add(new DiskResourceInterceptor(context, cacheConfig));
             interceptors.add(new ForceRemoteResourceInterceptor(context, cacheConfig));
             mForceModeChainList = interceptors;
@@ -39,7 +44,9 @@ public class OfflineServerImpl implements OfflineServer {
     private synchronized List<ResourceInterceptor> buildDefaultModeChain(Context context) {
         if (mDefaultModeChainList == null) {
             List<ResourceInterceptor> interceptors = new ArrayList<>();
-            interceptors.addAll(mBaseInterceptorList);
+            if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
+                interceptors.addAll(mBaseInterceptorList);
+            }
             interceptors.add(new DefaultRemoteResourceInterceptor(context));
             mDefaultModeChainList = interceptors;
         }
@@ -52,7 +59,8 @@ public class OfflineServerImpl implements OfflineServer {
         Context context = mContext;
         CacheConfig config = mCacheConfig;
         List<ResourceInterceptor> interceptors = isForceMode ? buildForceModeChain(context, config) : buildDefaultModeChain(context);
-        return callChain(interceptors, request);
+        WebResource resource = callChain(interceptors, request);
+        return generateWebResourceResponse(resource, request.getMime());
     }
 
     @Override
@@ -69,7 +77,7 @@ public class OfflineServerImpl implements OfflineServer {
         destroyAll(mForceModeChainList);
     }
 
-    private WebResourceResponse callChain(List<ResourceInterceptor> interceptors, CacheRequest request) {
+    private WebResource callChain(List<ResourceInterceptor> interceptors, CacheRequest request) {
         Chain chain = new Chain(interceptors);
         return chain.process(request);
     }
@@ -83,5 +91,22 @@ public class OfflineServerImpl implements OfflineServer {
                 ((Destroyable) interceptor).destroy();
             }
         }
+    }
+
+    private WebResourceResponse createWebResourceResponse(InputStream inputStream, String mimeType) {
+        try {
+            if (inputStream != null) {
+                return new WebResourceResponse(mimeType, "UTF-8", inputStream);
+            }
+        } catch (Exception ignore) {
+        }
+        return null;
+    }
+
+    private WebResourceResponse generateWebResourceResponse(WebResource resource, String mimeType) {
+        if (resource == null) {
+            return null;
+        }
+        return createWebResourceResponse(resource.getInputStream(), mimeType);
     }
 }

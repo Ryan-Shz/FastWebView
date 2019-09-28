@@ -95,7 +95,7 @@ cachedWebView.addResourceInterceptor(new ResourceInterceptor() {
 ### 执行JS脚本
 
 ```
-fastWebView.runJs(String function, Object... args);
+cachedWebView.runJs(String function, Object... args);
 ```
 
 ### 首次加载

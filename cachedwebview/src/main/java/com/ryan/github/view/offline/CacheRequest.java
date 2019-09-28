@@ -13,6 +13,7 @@ public class CacheRequest {
     private String extension;
     private boolean forceMode;
     private Map<String, String> mHeaders;
+    private String mUserAgent;
 
     public String getUrl() {
         return url;
@@ -52,5 +53,13 @@ public class CacheRequest {
 
     public Map<String, String> getHeaders() {
         return mHeaders;
+    }
+
+    public String getUserAgent() {
+        return mUserAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.mUserAgent = userAgent;
     }
 }

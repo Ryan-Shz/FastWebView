@@ -21,4 +21,6 @@ public interface WebViewCache {
     void addResourceInterceptor(ResourceInterceptor interceptor);
 
     void addHeader(String url, Map<String, String> header);
+
+    void setUserAgent(String userAgent);
 }

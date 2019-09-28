@@ -5,12 +5,15 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.CookieManager;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 
 import com.ryan.github.view.CachedWebView;
+import com.ryan.github.view.WebResource;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        CachedWebView cachedWebView = findViewById(R.id.fast_web_view);
+        CachedWebView cachedWebView = new CachedWebView(this);
+        setContentView(cachedWebView);
         cachedWebView.setFocusable(true);
         cachedWebView.setFocusableInTouchMode(true);
         WebSettings webSettings = cachedWebView.getSettings();
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setSupportZoom(false);
         webSettings.setBuiltInZoomControls(false);
+        webSettings.setUserAgentString("Android");
         webSettings.setDisplayZoomControls(false);
         webSettings.setDefaultTextEncodingName("UTF-8");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -41,15 +45,16 @@ public class MainActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(cachedWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        String url = "https://github.com/Ryan-Shz";
         cachedWebView.forceCache();
         cachedWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
-            public WebResourceResponse load(Chain chain) {
+            public WebResource load(Chain chain) {
                 return chain.process(chain.getRequest());
             }
         });
-        cachedWebView.loadUrl(url);
+        Map<String, String> headers = new HashMap<>();
+        headers.put("custom", "test");
+        cachedWebView.loadUrl("https://github.com/Ryan-Shz", headers);
     }
 }
 

@@ -85,6 +85,7 @@ public class CachedWebView extends WebView {
     @Override
     public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
         if (mWebViewCache != null) {
+            mWebViewCache.setUserAgent(getSettings().getUserAgentString());
             mWebViewCache.addHeader(url, additionalHttpHeaders);
         }
         super.loadUrl(url, additionalHttpHeaders);
