@@ -1,6 +1,5 @@
 package com.ryan.github.view;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +9,8 @@ import java.util.Map;
  */
 public class WebResource {
 
-    // 资源输入流
-    private InputStream inputStream;
+    private ReusableInputStream inputStream;
 
-    // 服务端相应头部信息
     private Map<String, List<String>> responseHeaders;
 
     private boolean isModified = true;
@@ -28,11 +25,11 @@ public class WebResource {
         return isModified;
     }
 
-    public InputStream getInputStream() {
+    public ReusableInputStream getInputStream() {
         return inputStream;
     }
 
-    public void setInputStream(InputStream inputStream) {
+    public void setInputStream(ReusableInputStream inputStream) {
         this.inputStream = inputStream;
     }
 

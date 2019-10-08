@@ -1,6 +1,7 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.ryan.github.view.CacheConfig;
 import com.ryan.github.view.DefaultExtensionFilter;
@@ -30,7 +31,8 @@ public class ForceRemoteResourceInterceptor implements Destroyable, ResourceInte
     @Override
     public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
-        boolean isFilter = mExtensionFilter.isFilter(request.getExtension());
+        String extension = request.getExtension();
+        boolean isFilter = TextUtils.isEmpty(extension) || mExtensionFilter.isFilter(extension);
         SourceRequest sourceRequest = new SourceRequest(request.getUrl(), isFilter, request.getHeaders());
         sourceRequest.setUserAgent(request.getUserAgent());
         WebResource resource = mResourceLoader.getResource(sourceRequest);

@@ -31,8 +31,6 @@ cachedWebView.forceCache();
 
 ```
 public DefaultExtensionFilter() {
-    mFilterExtensions = new HashSet<>();
-    addExtension("");
     addExtension("html");
     addExtension("mp4");
     addExtension("mp3");

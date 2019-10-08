@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 磁盘存储过滤器
+ * default filter.
  * <p>
  * Created by Ryan
  * 2018/2/11 下午3:16
@@ -15,7 +15,6 @@ public class DefaultExtensionFilter implements ExtensionFilter {
 
     public DefaultExtensionFilter() {
         mFilterExtensions = new HashSet<>();
-        addExtension("");
         addExtension("html");
         addExtension("mp4");
         addExtension("mp3");

@@ -1,13 +1,11 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.CacheConfig;
 import com.ryan.github.view.WebResource;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +20,15 @@ public class OfflineServerImpl implements OfflineServer {
     private List<ResourceInterceptor> mBaseInterceptorList;
     private List<ResourceInterceptor> mForceModeChainList;
     private List<ResourceInterceptor> mDefaultModeChainList;
+    private WebResourceResponseGenerator mResourceResponseGenerator;
 
     public OfflineServerImpl(Context context, CacheConfig cacheConfig) {
         mContext = context.getApplicationContext();
         mCacheConfig = cacheConfig;
+        mResourceResponseGenerator = new DefaultWebResponseGenerator();
     }
 
-    private synchronized List<ResourceInterceptor> buildForceModeChain(Context context, CacheConfig cacheConfig) {
+    private List<ResourceInterceptor> buildForceModeChain(Context context, CacheConfig cacheConfig) {
         if (mForceModeChainList == null) {
             List<ResourceInterceptor> interceptors = new ArrayList<>();
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
@@ -41,7 +41,7 @@ public class OfflineServerImpl implements OfflineServer {
         return mForceModeChainList;
     }
 
-    private synchronized List<ResourceInterceptor> buildDefaultModeChain(Context context) {
+    private List<ResourceInterceptor> buildDefaultModeChain(Context context) {
         if (mDefaultModeChainList == null) {
             List<ResourceInterceptor> interceptors = new ArrayList<>();
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
@@ -60,7 +60,7 @@ public class OfflineServerImpl implements OfflineServer {
         CacheConfig config = mCacheConfig;
         List<ResourceInterceptor> interceptors = isForceMode ? buildForceModeChain(context, config) : buildDefaultModeChain(context);
         WebResource resource = callChain(interceptors, request);
-        return generateWebResourceResponse(resource, request.getMime());
+        return mResourceResponseGenerator.generate(resource, request.getMime());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class OfflineServerImpl implements OfflineServer {
     }
 
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
         destroyAll(mDefaultModeChainList);
         destroyAll(mForceModeChainList);
     }
@@ -93,20 +93,4 @@ public class OfflineServerImpl implements OfflineServer {
         }
     }
 
-    private WebResourceResponse createWebResourceResponse(InputStream inputStream, String mimeType) {
-        try {
-            if (inputStream != null) {
-                return new WebResourceResponse(mimeType, "UTF-8", inputStream);
-            }
-        } catch (Exception ignore) {
-        }
-        return null;
-    }
-
-    private WebResourceResponse generateWebResourceResponse(WebResource resource, String mimeType) {
-        if (resource == null) {
-            return null;
-        }
-        return createWebResourceResponse(resource.getInputStream(), mimeType);
-    }
 }

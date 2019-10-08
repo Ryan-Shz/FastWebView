@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.sc.github.view"
+        applicationId "com.ryan.github.view"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1

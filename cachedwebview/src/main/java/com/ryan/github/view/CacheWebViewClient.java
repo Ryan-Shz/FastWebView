@@ -17,8 +17,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 /**
- * 实现缓存拦截
- * 完全代理外部使用的WebViewClient对象
+ * WebViewClient decorator for intercepting resource loading.
  * <p>
  * Created by Ryan
  * 2018/2/7 下午3:39

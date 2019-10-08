@@ -3,6 +3,7 @@ package com.ryan.github.view.loader;
 import android.util.Log;
 
 import com.ryan.github.view.WebResource;
+import com.ryan.github.view.ReusableInputStream;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -11,9 +12,7 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * 远程资源加载
- * 使用HttpUrlConnection下载静态资源
- * 如下载请求的是初始网址，或获取返回头部
+ * load remote resources using HttpURLConnection.
  * <p>
  * Created by Ryan
  * 2018/2/7 下午7:55
@@ -30,14 +29,15 @@ public class DefaultResourceLoader implements ResourceLoader {
             HttpURLConnection httpURLConnection = (HttpURLConnection) urlRequest.openConnection();
             putHeader(httpURLConnection, sourceRequest.getHeaders());
             httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setUseCaches(false);
+            httpURLConnection.setUseCaches(true);
             httpURLConnection.setConnectTimeout(20000);
             httpURLConnection.setReadTimeout(20000);
             httpURLConnection.connect();
             int responseCode = httpURLConnection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 WebResource remoteResource = new WebResource();
-                remoteResource.setInputStream(httpURLConnection.getInputStream());
+                ReusableInputStream inputStream = new ReusableInputStream(httpURLConnection.getInputStream());
+                remoteResource.setInputStream(inputStream);
                 remoteResource.setResponseHeaders(httpURLConnection.getHeaderFields());
                 return remoteResource;
             }

@@ -12,16 +12,16 @@ import okhttp3.OkHttpClient;
  * Created by Ryan
  * at 2019/9/26
  */
-public class OkHttpClientHolder {
+public class OkHttpClientProvider {
 
     private static final String CACHE_OKHTTP_DIR_NAME = "cached_webview_okhttp";
     private OkHttpClient mClient;
 
-    private OkHttpClientHolder() {
+    private OkHttpClientProvider() {
 
     }
 
-    private synchronized void ensureOkHttpClientCreated(Context context) {
+    private void ensureOkHttpClientCreated(Context context) {
         if (mClient == null) {
             String dir = context.getCacheDir() + File.separator + CACHE_OKHTTP_DIR_NAME;
             mClient = new OkHttpClient.Builder()
@@ -34,7 +34,7 @@ public class OkHttpClientHolder {
     }
 
     private static class SingletonHolder {
-        private static final OkHttpClientHolder INSTANCE = new OkHttpClientHolder();
+        private static final OkHttpClientProvider INSTANCE = new OkHttpClientProvider();
     }
 
     public static OkHttpClient get(Context context) {

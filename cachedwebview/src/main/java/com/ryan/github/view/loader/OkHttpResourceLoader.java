@@ -4,20 +4,23 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
-import com.ryan.github.view.okhttp.OkHttpClientHolder;
+import com.ryan.github.view.okhttp.OkHttpClientProvider;
+import com.ryan.github.view.utils.LogUtils;
+import com.ryan.github.view.ReusableInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
 import okhttp3.CacheControl;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
+ * load remote resources using okhttp.
+ * <p>
  * Created by Ryan
  * at 2019/9/26
  */
@@ -33,8 +36,9 @@ public class OkHttpResourceLoader implements ResourceLoader {
     @Override
     public WebResource getResource(SourceRequest sourceRequest) {
         String url = sourceRequest.getUrl();
+        LogUtils.d(String.format("load url: %s", url));
         boolean isCacheByOkHttp = sourceRequest.isCacheable();
-        OkHttpClient client = OkHttpClientHolder.get(mContext);
+        OkHttpClient client = OkHttpClientProvider.get(mContext);
         CacheControl.Builder builder = new CacheControl.Builder();
         if (!isCacheByOkHttp) {
             builder.noStore();
@@ -62,14 +66,17 @@ public class OkHttpResourceLoader implements ResourceLoader {
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
-            ResponseBody responseBody = response.body();
-            if (responseBody != null) {
-                InputStream is = responseBody.byteStream();
-                remoteResource.setModified(response.code() != 304);
-                remoteResource.setInputStream(is);
-                remoteResource.setResponseHeaders(response.headers().toMultimap());
-                remoteResource.setCache(!isCacheByOkHttp);
-                return remoteResource;
+            if (response.code() == 200 || response.code() == 304) {
+                ResponseBody responseBody = response.body();
+                if (responseBody != null) {
+                    InputStream is = responseBody.byteStream();
+                    remoteResource.setModified(response.code() != 304);
+                    ReusableInputStream inputStream = new ReusableInputStream(is);
+                    remoteResource.setInputStream(inputStream);
+                    remoteResource.setResponseHeaders(response.headers().toMultimap());
+                    remoteResource.setCache(!isCacheByOkHttp);
+                    return remoteResource;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

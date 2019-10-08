@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * WebView缓存实现类
- * <p>
  * Created by Ryan
  * 2018/2/7 下午5:07
  */
