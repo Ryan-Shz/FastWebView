@@ -36,19 +36,32 @@ fastWebView.openForceCache();
 
 使用强制缓存模式时，fastwebview会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
-默认的过滤器会过滤以下资源类型：（即以下类型的资源不会被缓存）
+默认的过滤器会过滤所有音视频和html等资源类型：（即以下类型的资源不会被缓存）
 
 ```
-public DefaultExtensionFilter() {
-    addExtension("html");
-    addExtension("mp4");
-    addExtension("mp3");
-    addExtension("ogg");
-    addExtension("avi");
-    addExtension("wmv");
-    addExtension("flv");
-    addExtension("rmvb");
-    addExtension("3gp");
+public DefaultMimeTypeFilter() {
+    addMimeType("text/html");
+    // audio
+    addMimeType("audio/mpeg");
+    addMimeType("audio/midi");
+    addMimeType("audio/webm");
+    addMimeType("audio/ogg");
+    addMimeType("audio/wave");
+    addMimeType("audio/wav");
+    addMimeType("audio/x-wav");
+    addMimeType("audio/mp4");
+    addMimeType("audio/x-pn-wav");
+    addMimeType("audio/x-ms-wma");
+    // video
+    addMimeType("video/webm");
+    addMimeType("video/ogg");
+    addMimeType("video/x-msvideo");
+    addMimeType("video/mp4");
+    addMimeType("video/mpeg");
+    addMimeType("video/quicktime");
+    addMimeType("video/x-ms-wmv");
+    addMimeType("video/x-flv");
+    addMimeType("video/x-matroska");
 }
 ```
 
