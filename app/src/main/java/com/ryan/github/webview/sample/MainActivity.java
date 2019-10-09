@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(fastWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        fastWebView.forceCache();
+        fastWebView.openForceCache();
         fastWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
             public WebResource load(Chain chain) {

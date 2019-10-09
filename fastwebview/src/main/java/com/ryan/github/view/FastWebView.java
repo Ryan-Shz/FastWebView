@@ -21,6 +21,7 @@ public class FastWebView extends WebView {
 
     private WebViewCache mWebViewCache;
     private CacheWebViewClient mCacheWebViewClient;
+    private WebViewClient mUserWebViewClient;
 
     public FastWebView(Context context) {
         this(context, null);
@@ -32,22 +33,16 @@ public class FastWebView extends WebView {
 
     public FastWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setCacheMode();
-        setCacheConfig(null);
-    }
-
-    private void setCacheMode() {
-        WebSettings webSettings = getSettings();
-        if (NetworkUtils.isAvailable(getContext())) {
-            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        } else {
-            webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
     }
 
     @Override
     public void setWebViewClient(WebViewClient client) {
-        mCacheWebViewClient.updateProxyClient(client);
+        if (mCacheWebViewClient != null) {
+            mCacheWebViewClient.updateProxyClient(client);
+        } else {
+            super.setWebViewClient(client);
+        }
+        mUserWebViewClient = client;
     }
 
     @Override
@@ -66,15 +61,28 @@ public class FastWebView extends WebView {
         super.destroy();
     }
 
+    private void initCache() {
+        initCacheMode();
+        setCacheConfig(null);
+    }
+
     public void setCacheConfig(CacheConfig cacheConfig) {
         mCacheWebViewClient = new CacheWebViewClient();
         mWebViewCache = new WebViewCacheImpl(getContext(), cacheConfig);
         mCacheWebViewClient.setWebViewCache(mWebViewCache);
+        if (mUserWebViewClient != null) {
+            mCacheWebViewClient.updateProxyClient(mUserWebViewClient);
+        }
         super.setWebViewClient(mCacheWebViewClient);
     }
 
-    public void forceCache() {
+    public void openForceCache() {
+        initCache();
         mWebViewCache.openForceMode();
+    }
+
+    public void openDefaultCache() {
+        initCache();
     }
 
     @Override
@@ -125,4 +133,17 @@ public class FastWebView extends WebView {
         this.loadUrl(script);
     }
 
+    private void initCacheMode() {
+        WebSettings webSettings = getSettings();
+        if (NetworkUtils.isAvailable(getContext())) {
+            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        } else {
+            webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        }
+    }
+
+    @Override
+    public WebViewClient getWebViewClient() {
+        return mUserWebViewClient != null ? mUserWebViewClient : super.getWebViewClient();
+    }
 }

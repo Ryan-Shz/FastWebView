@@ -16,13 +16,22 @@
 
 使用默认模式时，和使用原生webview无差异，提升webview默认缓存大小上限为100MB。
 
+##### 开启方式
+
+```
+FastWebView fastWebView = new FastWebView(this);
+fastWebView.openDefaultCache();
+```
+
+若未开启默认缓存模式，则和使用原生webview无差异。
+
 #### 强制模式
 
 ##### 开启方式
 
 ```
 FastWebView fastWebView = new FastWebView(this);
-fastWebView.forceCache();
+fastWebView.openForceCache();
 ```
 
 使用强制缓存模式时，fastwebview会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
