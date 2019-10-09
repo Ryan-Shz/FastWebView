@@ -1,7 +1,6 @@
 package com.ryan.github.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.WebResourceResponse;
 
@@ -9,9 +8,10 @@ import com.ryan.github.view.offline.CacheRequest;
 import com.ryan.github.view.offline.OfflineServer;
 import com.ryan.github.view.offline.OfflineServerImpl;
 import com.ryan.github.view.offline.ResourceInterceptor;
+import com.ryan.github.view.utils.AppVersionUtil;
 import com.ryan.github.view.utils.MimeTypeMapUtils;
 
-import java.net.URLEncoder;
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WebViewCacheImpl implements WebViewCache {
 
+    private static final String CACHE_DIR_NAME = "cached_webview_force";
+    private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
     private boolean mForceMode = false;
     private Map<String, Map<String, String>> mHeaders;
     private OfflineServer mOfflineServer;
@@ -28,6 +30,7 @@ public class WebViewCacheImpl implements WebViewCache {
 
     WebViewCacheImpl(Context context, CacheConfig cacheConfig) {
         mHeaders = new ConcurrentHashMap<>();
+        cacheConfig = generateCacheConfig(context, cacheConfig);
         mOfflineServer = new OfflineServerImpl(context, cacheConfig);
     }
 
@@ -41,7 +44,6 @@ public class WebViewCacheImpl implements WebViewCache {
         CacheRequest request = new CacheRequest();
         request.setUrl(url);
         request.setMime(mimeType);
-        request.setExtension(extension);
         request.setForceMode(mForceMode);
         request.setUserAgent(mUserAgent);
         Map<String, String> headers = mHeaders.get(formatUrl(url));
@@ -79,5 +81,18 @@ public class WebViewCacheImpl implements WebViewCache {
 
     private String formatUrl(String url) {
         return url.replaceAll("/+$", "");
+    }
+
+    private CacheConfig generateCacheConfig(Context context, CacheConfig userConfig) {
+        if (userConfig != null) {
+            return userConfig;
+        }
+        String dir = context.getCacheDir() + File.separator + CACHE_DIR_NAME;
+        return new CacheConfig.Builder()
+                .setExtensionFilter(new DefaultMimeTypeFilter())
+                .setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE)
+                .setVersion(AppVersionUtil.getVersionCode(context))
+                .setCacheDir(dir)
+                .build();
     }
 }

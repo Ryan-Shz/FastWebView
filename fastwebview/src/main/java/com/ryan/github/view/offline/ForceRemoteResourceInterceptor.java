@@ -4,8 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.ryan.github.view.CacheConfig;
-import com.ryan.github.view.DefaultExtensionFilter;
-import com.ryan.github.view.ExtensionFilter;
+import com.ryan.github.view.MimeTypeFilter;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.loader.OkHttpResourceLoader;
 import com.ryan.github.view.loader.ResourceLoader;
@@ -18,21 +17,18 @@ import com.ryan.github.view.loader.SourceRequest;
 public class ForceRemoteResourceInterceptor implements Destroyable, ResourceInterceptor {
 
     private ResourceLoader mResourceLoader;
-    private ExtensionFilter mExtensionFilter;
+    private MimeTypeFilter mMimeTypeFilter;
 
     ForceRemoteResourceInterceptor(Context context, CacheConfig cacheConfig) {
         mResourceLoader = new OkHttpResourceLoader(context);
-        mExtensionFilter = cacheConfig != null ? cacheConfig.getFilter() : null;
-        if (mExtensionFilter == null) {
-            mExtensionFilter = new DefaultExtensionFilter();
-        }
+        mMimeTypeFilter = cacheConfig != null ? cacheConfig.getFilter() : null;
     }
 
     @Override
     public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
-        String extension = request.getExtension();
-        boolean isFilter = TextUtils.isEmpty(extension) || mExtensionFilter.isFilter(extension);
+        String mime = request.getMime();
+        boolean isFilter = TextUtils.isEmpty(mime) || mMimeTypeFilter.isFilter(mime);
         SourceRequest sourceRequest = new SourceRequest(request.getUrl(), isFilter, request.getHeaders());
         sourceRequest.setUserAgent(request.getUserAgent());
         WebResource resource = mResourceLoader.getResource(sourceRequest);
@@ -44,8 +40,8 @@ public class ForceRemoteResourceInterceptor implements Destroyable, ResourceInte
 
     @Override
     public void destroy() {
-        if (mExtensionFilter != null) {
-            mExtensionFilter.clearExtension();
+        if (mMimeTypeFilter != null) {
+            mMimeTypeFilter.clear();
         }
     }
 }

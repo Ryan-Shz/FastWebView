@@ -10,7 +10,6 @@ public class CacheRequest {
 
     private String url;
     private String mime;
-    private String extension;
     private boolean forceMode;
     private Map<String, String> mHeaders;
     private String mUserAgent;
@@ -21,14 +20,6 @@ public class CacheRequest {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getExtension() {
-        return extension;
-    }
-
-    public void setExtension(String extension) {
-        this.extension = extension;
     }
 
     public String getMime() {

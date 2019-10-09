@@ -1,15 +1,13 @@
 package com.ryan.github.view.offline;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
-import com.ryan.github.view.utils.AppVersionUtil;
-import com.ryan.github.view.lru.DiskLruCache;
 import com.ryan.github.view.CacheConfig;
+import com.ryan.github.view.lru.DiskLruCache;
 import com.ryan.github.view.utils.LogUtils;
-import com.ryan.github.view.utils.MD5Utils;
 import com.ryan.github.view.ReusableInputStream;
+import com.ryan.github.view.utils.MD5Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,17 +28,13 @@ import okio.Okio;
  */
 public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor {
 
-    private static final String CACHE_DIR_NAME = "cached_webview_force";
-    private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
     private static final int ENTRY_META = 0;
     private static final int ENTRY_BODY = 1;
     private static final int ENTRY_COUNT = 2;
     private DiskLruCache mDiskLruCache;
-    private Context mContext;
     private CacheConfig mCacheConfig;
 
-    DiskResourceInterceptor(Context context, CacheConfig cacheConfig) {
-        mContext = context;
+    DiskResourceInterceptor(CacheConfig cacheConfig) {
         mCacheConfig = cacheConfig;
     }
 
@@ -48,18 +42,9 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         if (mDiskLruCache != null && !mDiskLruCache.isClosed()) {
             return;
         }
-        String dir;
-        int version;
-        long cacheSize;
-        if (mCacheConfig != null) {
-            dir = mCacheConfig.getCacheDir();
-            version = mCacheConfig.getVersion();
-            cacheSize = mCacheConfig.getDiskCacheSize();
-        } else {
-            dir = mContext.getCacheDir() + File.separator + CACHE_DIR_NAME;
-            version = AppVersionUtil.getVersionCode(mContext);
-            cacheSize = DEFAULT_DISK_CACHE_SIZE;
-        }
+        String dir = mCacheConfig.getCacheDir();
+        int version = mCacheConfig.getVersion();
+        long cacheSize = mCacheConfig.getDiskCacheSize();
         try {
             mDiskLruCache = DiskLruCache.open(new File(dir), version, ENTRY_COUNT, cacheSize);
         } catch (IOException e) {
@@ -117,7 +102,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             return webResource;
         }
         webResource = chain.process(request);
-        if (webResource != null && webResource.isCache()) {
+        if (webResource != null && (webResource.isCache() || isRealMimeTypeCacheable(webResource))) {
             cacheToDisk(request.getUrl(), webResource);
         }
         return webResource;
@@ -172,5 +157,27 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isRealMimeTypeCacheable(WebResource resource) {
+        if (resource == null) {
+            return false;
+        }
+        Map<String, List<String>> headers = resource.getResponseHeaders();
+        String contentType = null;
+        if (headers != null) {
+            String contentTypeKey = "content-type";
+            if (headers.containsKey(contentTypeKey)) {
+                List<String> contentTypeList = headers.get(contentTypeKey);
+                if (contentTypeList != null && !contentTypeList.isEmpty()) {
+                    String rawContentType = contentTypeList.get(0);
+                    String[] contentTypeArray = rawContentType.split(";");
+                    if (contentTypeArray.length >= 1) {
+                        contentType = contentTypeArray[0];
+                    }
+                }
+            }
+        }
+        return !mCacheConfig.getFilter().isFilter(contentType);
     }
 }
