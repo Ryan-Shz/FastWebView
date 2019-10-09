@@ -17,20 +17,20 @@ import java.util.Map;
  * Created by Ryan
  * 2018/2/7 下午3:33
  */
-public class CachedWebView extends WebView {
+public class FastWebView extends WebView {
 
     private WebViewCache mWebViewCache;
     private CacheWebViewClient mCacheWebViewClient;
 
-    public CachedWebView(Context context) {
+    public FastWebView(Context context) {
         this(context, null);
     }
 
-    public CachedWebView(Context context, AttributeSet attrs) {
+    public FastWebView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CachedWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FastWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setCacheMode();
         setCacheConfig(null);
@@ -92,7 +92,7 @@ public class CachedWebView extends WebView {
     }
 
     public static void preload(Context context, String url) {
-        new CachedWebView(context.getApplicationContext()).loadUrl(url);
+        new FastWebView(context.getApplicationContext()).loadUrl(url);
     }
 
     public void addResourceInterceptor(ResourceInterceptor interceptor) {

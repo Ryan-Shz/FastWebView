@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 
-import com.ryan.github.view.CachedWebView;
+import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
@@ -21,11 +21,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CachedWebView cachedWebView = new CachedWebView(this);
-        setContentView(cachedWebView);
-        cachedWebView.setFocusable(true);
-        cachedWebView.setFocusableInTouchMode(true);
-        WebSettings webSettings = cachedWebView.getSettings();
+        FastWebView fastWebView = new FastWebView(this);
+        setContentView(fastWebView);
+        fastWebView.setFocusable(true);
+        fastWebView.setFocusableInTouchMode(true);
+        WebSettings webSettings = fastWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setAllowFileAccess(true);
@@ -42,11 +42,11 @@ public class MainActivity extends AppCompatActivity {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.setAcceptThirdPartyCookies(cachedWebView, true);
+            cookieManager.setAcceptThirdPartyCookies(fastWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        cachedWebView.forceCache();
-        cachedWebView.addResourceInterceptor(new ResourceInterceptor() {
+        fastWebView.forceCache();
+        fastWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
             public WebResource load(Chain chain) {
                 return chain.process(chain.getRequest());
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         });
         Map<String, String> headers = new HashMap<>();
         headers.put("custom", "test");
-        cachedWebView.loadUrl("https://github.com/Ryan-Shz", headers);
+        fastWebView.loadUrl("https://github.com/Ryan-Shz", headers);
     }
 }
 

@@ -1,4 +1,4 @@
-# CachedWebView
+# FastWebView
 ## 特性
 
 1. 自定义本地缓存，突破原生webview缓存上限限制
@@ -21,11 +21,11 @@
 ##### 开启方式
 
 ```
-CachedWebView cachedWebView = new CachedWebView(this);
-cachedWebView.forceCache();
+FastWebView fastWebView = new FastWebView(this);
+fastWebView.forceCache();
 ```
 
-使用强制缓存模式时，cachedwebview会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
+使用强制缓存模式时，fastwebview会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
 默认的过滤器会过滤以下资源类型：（即以下类型的资源不会被缓存）
 
@@ -46,7 +46,7 @@ public DefaultExtensionFilter() {
 ##### 配置选项
 
 ```
-cachedWebView.setCacheConfig(new CacheConfig.Builder()
+fastWebView.setCacheConfig(new CacheConfig.Builder()
         .setCacheDir(String fileDir)
         .setExtensionFilter(ExtensionFilter filter)
         .setVersion(int version)
@@ -63,7 +63,7 @@ cachedWebView.setCacheConfig(new CacheConfig.Builder()
 
 由于cachewebview的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
 
-所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，cachedwebview会重新从网络下载。
+所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，fastwebview会重新从网络下载。
 
 #### 添加拦截器
 
@@ -74,8 +74,8 @@ cachedWebView.setCacheConfig(new CacheConfig.Builder()
 添加拦截器方式如下：
 
 ```
-CachedWebView cachedWebView = new CachedWebView(this);
-cachedWebView.addResourceInterceptor(new ResourceInterceptor() {
+FastWebView fastWebView = new FastWebView(this);
+fastWebView.addResourceInterceptor(new ResourceInterceptor() {
     @Override
     public WebResourceResponse load(Chain chain) {
     	CacheRequest request = chain.getRequest();
@@ -93,13 +93,13 @@ cachedWebView.addResourceInterceptor(new ResourceInterceptor() {
 ### 执行JS脚本
 
 ```
-cachedWebView.runJs(String function, Object... args);
+fastWebView.runJs(String function, Object... args);
 ```
 
 ### 首次加载
 首次加载需要完整加载整个H5页面，所以加载速度跟普通webview一样，如果想提高首次加载速度，可以使用preload来预加载页面。
 ```
-CachedWebView.preload(Context context, String url)
+FastWebView.preload(Context context, String url)
 ```
 
 ## 原理
