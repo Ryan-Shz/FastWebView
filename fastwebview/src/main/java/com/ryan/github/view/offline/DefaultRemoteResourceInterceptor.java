@@ -30,5 +30,4 @@ public class DefaultRemoteResourceInterceptor implements ResourceInterceptor {
         }
         return chain.process(request);
     }
-
 }

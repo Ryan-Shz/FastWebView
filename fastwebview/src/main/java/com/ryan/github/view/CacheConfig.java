@@ -10,6 +10,8 @@ public class CacheConfig {
     private int mVersion;
     private long mDiskCacheSize;
     private MimeTypeFilter mFilter;
+    private boolean memoryCacheEnable = true;
+    private int maxMemoryCacheSize;
 
     private CacheConfig() {
 
@@ -35,12 +37,22 @@ public class CacheConfig {
         return mDiskCacheSize;
     }
 
+    public int getMaxMemoryCacheSize() {
+        return maxMemoryCacheSize;
+    }
+
+    public boolean isMemoryCacheEnable() {
+        return memoryCacheEnable;
+    }
+
     public static class Builder {
 
         private String cacheDir;
         private int version;
         private long diskCacheSize;
         private MimeTypeFilter filter;
+        private boolean memoryCacheEnable = true;
+        private int maxMemoryCacheSize;
 
         public Builder setCacheDir(String cacheDir) {
             this.cacheDir = cacheDir;
@@ -62,12 +74,24 @@ public class CacheConfig {
             return this;
         }
 
+        public Builder setMemoryCacheEnable(boolean enable){
+            this.memoryCacheEnable = enable;
+            return this;
+        }
+
+        public Builder setMaxMemoryCacheSize(int memoryCacheSize){
+            this.maxMemoryCacheSize = memoryCacheSize;
+            return this;
+        }
+
         public CacheConfig build() {
             CacheConfig config = new CacheConfig();
             config.mCacheDir = cacheDir;
             config.mVersion = version;
             config.mDiskCacheSize = diskCacheSize;
             config.mFilter = filter;
+            config.memoryCacheEnable = memoryCacheEnable;
+            config.maxMemoryCacheSize = maxMemoryCacheSize;
             return config;
         }
     }

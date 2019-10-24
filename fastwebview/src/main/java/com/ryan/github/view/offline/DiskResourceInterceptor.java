@@ -52,12 +52,11 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         }
     }
 
-    private WebResource getFromDiskCache(String url) {
+    private WebResource getFromDiskCache(String key) {
         try {
             if (mDiskLruCache.isClosed()) {
                 return null;
             }
-            String key = getKey(url);
             DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
             if (snapshot != null) {
                 // 1. read headers
@@ -88,22 +87,19 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         return null;
     }
 
-    private static String getKey(String url) {
-        return MD5Utils.getMD5(URLEncoder.encode(url), false);
-    }
 
     @Override
     public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
         ensureDiskLruCacheCreate();
-        WebResource webResource = getFromDiskCache(request.getUrl());
+        WebResource webResource = getFromDiskCache(request.getKey());
         if (webResource != null) {
             LogUtils.d(String.format("disk cache hit: %s", request.getUrl()));
             return webResource;
         }
         webResource = chain.process(request);
         if (webResource != null && (webResource.isCache() || isRealMimeTypeCacheable(webResource))) {
-            cacheToDisk(request.getUrl(), webResource);
+            cacheToDisk(request.getKey(), webResource);
         }
         return webResource;
     }
@@ -119,29 +115,28 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         }
     }
 
-    private void cacheToDisk(String url, WebResource webResource) {
+    private void cacheToDisk(String key, WebResource webResource) {
         if (webResource == null || webResource.getInputStream() == null) {
+            return;
+        }
+        if (mDiskLruCache.isClosed()) {
             return;
         }
         try {
             InputStream inputStream = webResource.getInputStream();
             inputStream.reset();
-            if (mDiskLruCache.isClosed()) {
-                return;
-            }
-            String urlKey = getKey(url);
-            DiskLruCache.Editor editor = mDiskLruCache.edit(urlKey);
+            DiskLruCache.Editor editor = mDiskLruCache.edit(key);
             // 1. write response header
             Map<String, List<String>> headers = webResource.getResponseHeaders();
             OutputStream metaOutput = editor.newOutputStream(ENTRY_META);
             BufferedSink sink = Okio.buffer(Okio.sink(metaOutput));
             sink.writeDecimalLong(headers.size()).writeByte('\n');
             for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue().get(0);
-                sink.writeUtf8(key)
+                String headerKey = entry.getKey();
+                String headerValue = entry.getValue().get(0);
+                sink.writeUtf8(headerKey)
                         .writeUtf8(": ")
-                        .writeUtf8(value)
+                        .writeUtf8(headerValue)
                         .writeByte('\n');
             }
             sink.flush();
@@ -149,13 +144,23 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             // 2. write response body
             OutputStream bodyOutput = editor.newOutputStream(ENTRY_BODY);
             sink = Okio.buffer(Okio.sink(bodyOutput));
-            sink.writeAll(Okio.source(inputStream));
+            byte[] originBytes = webResource.getOriginBytes();
+            if (originBytes != null && originBytes.length > 0) {
+                sink.write(originBytes);
+            } else {
+                sink.writeAll(Okio.source(webResource.getInputStream()));
+            }
             sink.flush();
             sink.close();
             editor.commit();
             inputStream.reset();
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.d("cache to disk failed. cause by: " + e.getMessage());
+            try {
+                // clean the redundant data
+                mDiskLruCache.remove(key);
+            } catch (IOException ignore) {
+            }
         }
     }
 
@@ -181,3 +186,4 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         return !mCacheConfig.getFilter().isFilter(contentType);
     }
 }
+

@@ -73,17 +73,21 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
         .setExtensionFilter(ExtensionFilter filter)
         .setVersion(int version)
         .setDiskCacheSize(long diskCacheSize)
+        .setMaxMemoryCacheSize(int maxMemoryCacheSize)
+        .setMemoryCacheEnable(boolean enable)
         .build());
 ```
 
 1. setCacheDir(String fileDir) 设置强制缓存目录
 2. setExtensionFilter(ExtensionFilter filter) 设置资源类型过滤器
-3. setVersion(int version) 设置缓存版本
-4. setDiskCacheSize(long diskCacheSize) 设置缓存最大大小
+3. setVersion(int version) 设置缓存版本，默认为1
+4. setDiskCacheSize(long diskCacheSize) 设置磁盘缓存上限大小
+5. setMemoryCacheEnable(boolean enable) 设置是否打开内存缓存，默认为true
+6. setMaxMemoryCacheSize(int maxMemoryCacheSize) 设置内存缓存上限大小
 
 ##### 如何更新静态资源？
 
-由于cachewebview的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
+由于FastWebView的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
 
 所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，fastwebview会重新从网络下载。
 

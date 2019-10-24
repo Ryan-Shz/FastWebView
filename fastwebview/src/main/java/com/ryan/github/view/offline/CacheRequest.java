@@ -1,5 +1,8 @@
 package com.ryan.github.view.offline;
 
+import com.ryan.github.view.utils.MD5Utils;
+
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -8,18 +11,15 @@ import java.util.Map;
  */
 public class CacheRequest {
 
+    private String key;
     private String url;
     private String mime;
     private boolean forceMode;
     private Map<String, String> mHeaders;
     private String mUserAgent;
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public String getKey() {
+        return key;
     }
 
     public String getMime() {
@@ -52,5 +52,18 @@ public class CacheRequest {
 
     public void setUserAgent(String userAgent) {
         this.mUserAgent = userAgent;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+        this.key = generateKey(url);
+    }
+
+    private static String generateKey(String url) {
+        return MD5Utils.getMD5(URLEncoder.encode(url), false);
     }
 }
