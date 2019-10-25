@@ -8,13 +8,13 @@
 5. 大幅提高WebView二次加载速度
 
 ## 使用方法
-替换原生的WebView即可。
+将原生的WebView替换为fastwebview即可。fastwebview提供以下两种缓存模式，且均需要手动开启，若未主动开启，则fastwebview和原生webview无任何差异。
 
 ### 缓存模式
 
 #### 默认模式
 
-使用默认模式时，和使用原生webview无差异，提升webview默认缓存大小上限为100MB。
+使用默认模式时，默认的网络请求方式由HttpUrlConnection修改为okhttp，并提升webview默认缓存大小上限为100MB。
 
 ##### 开启方式
 
@@ -22,8 +22,6 @@
 FastWebView fastWebView = new FastWebView(this);
 fastWebView.openDefaultCache();
 ```
-
-若未开启默认缓存模式，则和使用原生webview无差异。
 
 #### 强制模式
 
