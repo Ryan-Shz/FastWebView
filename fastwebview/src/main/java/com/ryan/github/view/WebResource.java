@@ -10,15 +10,19 @@ import java.util.Map;
  */
 public class WebResource {
 
+    private int responseCode;
+
+    private String reasonPhrase;
+
     private ReusableInputStream inputStream;
 
-    private Map<String, List<String>> responseHeaders;
+    private Map<String, String> responseHeaders;
 
     private boolean isModified = true;
 
     private boolean isCache = false;
 
-    private byte[] mOriginBytes;
+    private byte[] originBytes;
 
     public void setModified(boolean modified) {
         isModified = modified;
@@ -36,11 +40,11 @@ public class WebResource {
         this.inputStream = inputStream;
     }
 
-    public Map<String, List<String>> getResponseHeaders() {
+    public Map<String, String> getResponseHeaders() {
         return responseHeaders;
     }
 
-    public void setResponseHeaders(Map<String, List<String>> responseHeaders) {
+    public void setResponseHeaders(Map<String, String> responseHeaders) {
         this.responseHeaders = responseHeaders;
     }
 
@@ -53,18 +57,34 @@ public class WebResource {
     }
 
     public void setOriginBytes(byte[] bytes) {
-        this.mOriginBytes = bytes;
+        this.originBytes = bytes;
     }
 
     public boolean newResource() {
-        if (mOriginBytes != null) {
-            this.inputStream = new ReusableInputStream(new ByteArrayInputStream(mOriginBytes));
+        if (originBytes != null) {
+            this.inputStream = new ReusableInputStream(new ByteArrayInputStream(originBytes));
             return true;
         }
         return false;
     }
 
     public byte[] getOriginBytes() {
-        return mOriginBytes;
+        return originBytes;
+    }
+
+    public void setReasonPurase(String reasonPhrase) {
+        this.reasonPhrase = reasonPhrase;
+    }
+
+    public String getReasonPhrase() {
+        return reasonPhrase;
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 }

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.ReusableInputStream;
+import com.ryan.github.view.utils.HeaderUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -38,7 +39,9 @@ public class DefaultResourceLoader implements ResourceLoader {
                 WebResource remoteResource = new WebResource();
                 ReusableInputStream inputStream = new ReusableInputStream(httpURLConnection.getInputStream());
                 remoteResource.setInputStream(inputStream);
-                remoteResource.setResponseHeaders(httpURLConnection.getHeaderFields());
+                remoteResource.setResponseCode(responseCode);
+                remoteResource.setReasonPurase(httpURLConnection.getResponseMessage());
+                remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(httpURLConnection.getHeaderFields()));
                 return remoteResource;
             }
             httpURLConnection.disconnect();

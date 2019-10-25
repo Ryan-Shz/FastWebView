@@ -5,8 +5,10 @@ import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
+import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
 import com.ryan.github.view.ReusableInputStream;
+import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +28,8 @@ import okhttp3.ResponseBody;
  */
 public class OkHttpResourceLoader implements ResourceLoader {
 
-    private static final String USER_AGENT = "User-Agent";
+    private static final String HEADER_USER_AGENT = "User-Agent";
+    private static final String DEFAULT_USER_AGENT = "FastWebView" + BuildConfig.VERSION_NAME;
     private Context mContext;
 
     public OkHttpResourceLoader(Context context) {
@@ -45,11 +48,15 @@ public class OkHttpResourceLoader implements ResourceLoader {
         }
         String userAgent = sourceRequest.getUserAgent();
         if (TextUtils.isEmpty(userAgent)) {
-            userAgent = "Android";
+            userAgent = DEFAULT_USER_AGENT;
         }
         Request.Builder requestBuilder = new Request.Builder()
-                .removeHeader(USER_AGENT)
-                .addHeader(USER_AGENT, userAgent);
+                .removeHeader(HEADER_USER_AGENT)
+                .addHeader(HEADER_USER_AGENT, userAgent)
+                .addHeader("Upgrade-Insecure-Requests", "1")
+                .addHeader("Accept-Language", "en-US,en;q=0.9")
+                .addHeader("X-Requested-With", mContext.getPackageName())
+                .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
         Map<String, String> headers = sourceRequest.getHeaders();
         if (headers != null && !headers.isEmpty()) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -70,10 +77,12 @@ public class OkHttpResourceLoader implements ResourceLoader {
                 ResponseBody responseBody = response.body();
                 if (responseBody != null) {
                     InputStream is = responseBody.byteStream();
+                    remoteResource.setResponseCode(response.code());
+                    remoteResource.setReasonPurase(response.message());
                     remoteResource.setModified(response.code() != 304);
                     ReusableInputStream inputStream = new ReusableInputStream(is);
                     remoteResource.setInputStream(inputStream);
-                    remoteResource.setResponseHeaders(response.headers().toMultimap());
+                    remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
                     remoteResource.setCache(!isCacheByOkHttp);
                     return remoteResource;
                 }

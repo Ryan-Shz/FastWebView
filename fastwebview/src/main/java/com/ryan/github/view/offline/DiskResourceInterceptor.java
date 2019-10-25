@@ -5,16 +5,14 @@ import android.text.TextUtils;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.CacheConfig;
 import com.ryan.github.view.lru.DiskLruCache;
+import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
 import com.ryan.github.view.ReusableInputStream;
-import com.ryan.github.view.utils.MD5Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.Headers;
@@ -59,10 +57,13 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             }
             DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
             if (snapshot != null) {
-                // 1. read headers
                 BufferedSource entrySource = Okio.buffer(Okio.source(snapshot.getInputStream(ENTRY_META)));
+                // 1. read status
+                String responseCode = entrySource.readUtf8LineStrict();
+                String reasonPhrase = entrySource.readUtf8LineStrict();
+                // 2. read headers
                 long headerSize = entrySource.readDecimalLong();
-                Map<String, List<String>> headers;
+                Map<String, String> headers;
                 Headers.Builder responseHeadersBuilder = new Headers.Builder();
                 for (int i = 0; i < headerSize; i++) {
                     String line = entrySource.readUtf8LineStrict();
@@ -70,11 +71,13 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                         responseHeadersBuilder.add(line);
                     }
                 }
-                headers = responseHeadersBuilder.build().toMultimap();
-                // 2. read body
+                headers = HeaderUtils.generateHeadersMap(responseHeadersBuilder.build());
+                // 3. read body
                 InputStream inputStream = snapshot.getInputStream(ENTRY_BODY);
                 if (inputStream != null) {
                     WebResource webResource = new WebResource();
+                    webResource.setReasonPurase(reasonPhrase);
+                    webResource.setResponseCode(Integer.valueOf(responseCode));
                     webResource.setInputStream(new ReusableInputStream(inputStream));
                     webResource.setResponseHeaders(headers);
                     webResource.setModified(false);
@@ -123,17 +126,18 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             return;
         }
         try {
-            InputStream inputStream = webResource.getInputStream();
-            inputStream.reset();
             DiskLruCache.Editor editor = mDiskLruCache.edit(key);
-            // 1. write response header
-            Map<String, List<String>> headers = webResource.getResponseHeaders();
             OutputStream metaOutput = editor.newOutputStream(ENTRY_META);
             BufferedSink sink = Okio.buffer(Okio.sink(metaOutput));
+            // 1. write status
+            sink.writeUtf8(String.valueOf(webResource.getResponseCode())).writeByte('\n');
+            sink.writeUtf8(webResource.getReasonPhrase()).writeByte('\n');
+            // 2. write response header
+            Map<String, String> headers = webResource.getResponseHeaders();
             sink.writeDecimalLong(headers.size()).writeByte('\n');
-            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
                 String headerKey = entry.getKey();
-                String headerValue = entry.getValue().get(0);
+                String headerValue = entry.getValue();
                 sink.writeUtf8(headerKey)
                         .writeUtf8(": ")
                         .writeUtf8(headerValue)
@@ -141,19 +145,26 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             }
             sink.flush();
             sink.close();
-            // 2. write response body
+            // 3. write response body
             OutputStream bodyOutput = editor.newOutputStream(ENTRY_BODY);
             sink = Okio.buffer(Okio.sink(bodyOutput));
             byte[] originBytes = webResource.getOriginBytes();
             if (originBytes != null && originBytes.length > 0) {
                 sink.write(originBytes);
             } else {
-                sink.writeAll(Okio.source(webResource.getInputStream()));
+                InputStream inputStream = webResource.getInputStream();
+                inputStream.reset();
+                BufferedSource source = Okio.buffer(Okio.source(inputStream));
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = source.read(buffer)) != -1) {
+                    sink.write(buffer, 0, len);
+                }
+                inputStream.reset();
             }
             sink.flush();
             sink.close();
             editor.commit();
-            inputStream.reset();
         } catch (IOException e) {
             LogUtils.d("cache to disk failed. cause by: " + e.getMessage());
             try {
@@ -168,15 +179,14 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         if (resource == null) {
             return false;
         }
-        Map<String, List<String>> headers = resource.getResponseHeaders();
+        Map<String, String> headers = resource.getResponseHeaders();
         String contentType = null;
         if (headers != null) {
-            String contentTypeKey = "content-type";
+            String contentTypeKey = "Content-Type";
             if (headers.containsKey(contentTypeKey)) {
-                List<String> contentTypeList = headers.get(contentTypeKey);
-                if (contentTypeList != null && !contentTypeList.isEmpty()) {
-                    String rawContentType = contentTypeList.get(0);
-                    String[] contentTypeArray = rawContentType.split(";");
+                String contentTypeValue = headers.get(contentTypeKey);
+                if (!TextUtils.isEmpty(contentTypeValue)) {
+                    String[] contentTypeArray = contentTypeValue.split(";");
                     if (contentTypeArray.length >= 1) {
                         contentType = contentTypeArray[0];
                     }

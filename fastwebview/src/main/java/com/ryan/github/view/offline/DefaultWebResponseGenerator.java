@@ -1,11 +1,13 @@
 package com.ryan.github.view.offline;
 
+import android.os.Build;
 import android.text.TextUtils;
 import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,16 +22,15 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         if (resource == null) {
             return null;
         }
-        Map<String, List<String>> headers = resource.getResponseHeaders();
+        Map<String, String> headers = resource.getResponseHeaders();
         String contentType = null;
         String charset = null;
         if (headers != null) {
-            String contentTypeKey = "content-type";
+            String contentTypeKey = "Content-Type";
             if (headers.containsKey(contentTypeKey)) {
-                List<String> contentTypeList = headers.get(contentTypeKey);
-                if (contentTypeList != null && !contentTypeList.isEmpty()) {
-                    String rawContentType = contentTypeList.get(0);
-                    String[] contentTypeArray = rawContentType.split(";");
+                String contentTypeValue = headers.get(contentTypeKey);
+                if (!TextUtils.isEmpty(contentTypeValue)) {
+                    String[] contentTypeArray = contentTypeValue.split(";");
                     if (contentTypeArray.length >= 1) {
                         contentType = contentTypeArray[0];
                     }
@@ -49,16 +50,14 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         if (TextUtils.isEmpty(charset)) {
             charset = "UTF-8";
         }
-        return createWebResourceResponse(resource.getInputStream(), urlMime, charset);
-    }
-
-    private WebResourceResponse createWebResourceResponse(InputStream inputStream, String mimeType, String charset) {
-        try {
-            if (inputStream != null) {
-                return new WebResourceResponse(mimeType, charset, inputStream);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int status = resource.getResponseCode();
+            String reasonPhrase = resource.getReasonPhrase();
+            if (TextUtils.isEmpty(reasonPhrase) && status == 200) {
+                reasonPhrase = "OK";
             }
-        } catch (Exception ignore) {
+            return new WebResourceResponse(urlMime, charset, status, reasonPhrase, resource.getResponseHeaders(), resource.getInputStream());
         }
-        return null;
+        return new WebResourceResponse(urlMime, charset, resource.getInputStream());
     }
 }
