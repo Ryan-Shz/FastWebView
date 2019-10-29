@@ -8,6 +8,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.ryan.github.view.cookie.CookieInterceptor;
+import com.ryan.github.view.cookie.CookieConfigManager;
+import com.ryan.github.view.cookie.CookieStrategy;
 import com.ryan.github.view.utils.NetworkUtils;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
@@ -22,6 +25,7 @@ public class FastWebView extends WebView {
     private WebViewCache mWebViewCache;
     private CacheWebViewClient mCacheWebViewClient;
     private WebViewClient mUserWebViewClient;
+    private CookieConfigManager mCookieManager;
 
     public FastWebView(Context context) {
         this(context, null);
@@ -33,6 +37,7 @@ public class FastWebView extends WebView {
 
     public FastWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mCookieManager = CookieConfigManager.getInstance();
     }
 
     @Override
@@ -58,6 +63,7 @@ public class FastWebView extends WebView {
         if (mWebViewCache != null) {
             mWebViewCache.destroyResource();
         }
+        mCookieManager.clear();
         super.destroy();
     }
 
@@ -145,5 +151,17 @@ public class FastWebView extends WebView {
     @Override
     public WebViewClient getWebViewClient() {
         return mUserWebViewClient != null ? mUserWebViewClient : super.getWebViewClient();
+    }
+
+    public void setCookieStrategy(CookieStrategy strategy) {
+        mCookieManager.setCookieStrategy(strategy);
+    }
+
+    public void setRequestCookieInterceptor(CookieInterceptor interceptor) {
+        mCookieManager.setRequestCookieInterceptor(interceptor);
+    }
+
+    public void setResponseCookieInterceptor(CookieInterceptor interceptor) {
+        mCookieManager.setResponseCookieInterceptor(interceptor);
     }
 }

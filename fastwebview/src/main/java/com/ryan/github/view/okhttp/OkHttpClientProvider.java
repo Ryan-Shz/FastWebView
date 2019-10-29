@@ -2,6 +2,13 @@ package com.ryan.github.view.okhttp;
 
 import android.content.Context;
 
+import com.ryan.github.view.cookie.CookieConfigManager;
+import com.ryan.github.view.cookie.CookieJarImpl;
+import com.ryan.github.view.cookie.CookieStore;
+import com.ryan.github.view.cookie.CookieStrategy;
+import com.ryan.github.view.cookie.MemoryCookieStore;
+import com.ryan.github.view.cookie.PersistentCookieStore;
+
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +31,14 @@ public class OkHttpClientProvider {
     private void ensureOkHttpClientCreated(Context context) {
         if (mClient == null) {
             String dir = context.getCacheDir() + File.separator + CACHE_OKHTTP_DIR_NAME;
+            CookieStore cookieStore;
+            if (CookieConfigManager.getInstance().getCookieStrategy() == CookieStrategy.PERSISTENT) {
+                cookieStore = new PersistentCookieStore(context);
+            } else {
+                cookieStore = new MemoryCookieStore();
+            }
             mClient = new OkHttpClient.Builder()
+                    .cookieJar(new CookieJarImpl(cookieStore))
                     .cache(new Cache(new File(dir), 100 * 1024 * 1024))
                     .readTimeout(20, TimeUnit.SECONDS)
                     .writeTimeout(20, TimeUnit.SECONDS)

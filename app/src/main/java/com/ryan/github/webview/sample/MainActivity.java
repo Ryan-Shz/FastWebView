@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -14,11 +15,17 @@ import android.webkit.WebViewClient;
 import com.google.gson.Gson;
 import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.WebResource;
+import com.ryan.github.view.cookie.CookieInterceptor;
+import com.ryan.github.view.cookie.CookieStrategy;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,14 +59,14 @@ public class MainActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(fastWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        fastWebView.openForceCache();
+        fastWebView.openDefaultCache();
         fastWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
             public WebResource load(Chain chain) {
                 return chain.process(chain.getRequest());
             }
         });
-        fastWebView.setWebViewClient(new WebViewClient(){
+        fastWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -70,11 +77,42 @@ public class MainActivity extends AppCompatActivity {
         fastWebView.addJavascriptInterface(this, "android");
         Map<String, String> headers = new HashMap<>();
         headers.put("custom", "test");
-        fastWebView.loadUrl("https://github.com/Ryan-Shz", headers);
+
+        String url = "https://github.com/Ryan-Shz";
+
+        CookieSyncManager.createInstance(this);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        cookieManager.removeSessionCookie();// 移除旧的[可以省略]
+        cookieManager.setCookie(url, "custom=12345678910;");
+        CookieSyncManager.getInstance().sync();
+
+        fastWebView.setCookieStrategy(CookieStrategy.PERSISTENT);
+        fastWebView.setRequestCookieInterceptor(new CookieInterceptor() {
+            @Override
+            public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
+                for (Cookie cookie : originCookies) {
+                    Log.v(TAG, "request cookies: " + cookie.toString());
+                }
+                return originCookies;
+            }
+        });
+
+        fastWebView.setResponseCookieInterceptor(new CookieInterceptor() {
+            @Override
+            public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
+                for (Cookie cookie : originCookies) {
+                    Log.v(TAG, "response cookies: " + cookie.toString());
+                }
+                return originCookies;
+            }
+        });
+
+        fastWebView.loadUrl(url, headers);
     }
 
     @JavascriptInterface
-    public void sendResource(String timing){
+    public void sendResource(String timing) {
         Performance performance = new Gson().fromJson(timing, Performance.class);
         Log.v(TAG, "request cost time: " + (performance.getResponseEnd() - performance.getRequestStart()) + "ms");
         Log.v(TAG, "dom build time: " + (performance.getDomComplete() - performance.getDomInteractive()) + "ms.");
