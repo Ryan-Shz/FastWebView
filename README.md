@@ -6,6 +6,7 @@
 3. 自定义拦截器支持自定义读取静态资源（比如读取assets中的资源）
 4. 支持离线加载/预加载
 5. 大幅提高WebView二次加载速度
+6. 提供cookie缓存模式（内存or持久），自动缓存cookie，在请求中携带cookie.
 
 ## 使用方法
 将原生的WebView替换为fastwebview即可。fastwebview提供以下两种缓存模式，且均需要手动开启，若未主动开启，则fastwebview和原生webview无任何差异。
