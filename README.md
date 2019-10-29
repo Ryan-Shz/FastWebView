@@ -6,27 +6,25 @@
 3. 自定义拦截器支持自定义读取静态资源（比如读取assets中的资源）
 4. 支持离线加载/预加载
 5. 大幅提高WebView二次加载速度
-6. 提供cookie缓存模式（内存or持久），自动缓存cookie，在请求中携带cookie.
+6. cookie自动缓存（提供两种缓存模式：内存缓存或持久缓存）和发布
 
 ## 使用方法
 将原生的WebView替换为fastwebview即可。fastwebview提供以下两种缓存模式，且均需要手动开启，若未主动开启，则fastwebview和原生webview无任何差异。
 
-### 缓存模式
-
-#### 默认模式
+### 默认缓存模式
 
 使用默认模式时，默认的网络请求方式由HttpUrlConnection修改为okhttp，并提升webview默认缓存大小上限为100MB。
 
-##### 开启方式
+#### 开启方式
 
 ```
 FastWebView fastWebView = new FastWebView(this);
 fastWebView.openDefaultCache();
 ```
 
-#### 强制模式
+### 强制缓存模式
 
-##### 开启方式
+#### 开启方式
 
 ```
 FastWebView fastWebView = new FastWebView(this);
@@ -64,7 +62,7 @@ public DefaultMimeTypeFilter() {
 }
 ```
 
-##### 配置选项
+#### 强制缓存模式可配置选项
 
 ```
 fastWebView.setCacheConfig(new CacheConfig.Builder()
@@ -84,13 +82,13 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 5. setMemoryCacheEnable(boolean enable) 设置是否打开内存缓存，默认为true
 6. setMaxMemoryCacheSize(int maxMemoryCacheSize) 设置内存缓存上限大小
 
-##### 如何更新静态资源？
+### 如何更新静态资源？
 
 由于FastWebView的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
 
 所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，fastwebview会重新从网络下载。
 
-#### 添加拦截器
+### 添加资源加载拦截器
 
 需要注意的是，ResourceInterceptor对于以上两种缓存模式都是生效的。
 
@@ -114,19 +112,33 @@ fastWebView.addResourceInterceptor(new ResourceInterceptor() {
     }
 });
 ```
+### Cookie选项
+#### Cookie缓存模式
+FastWebView实现了Cookie的自动缓存，并提供了以下两种缓存模式：
+```
+CookieStrategy.MEMORY; // 内存缓存模式
+CookieStrategy.PERSISTENT; // 持久缓存模式
+```
+可以通过fastWebView.setCookieStrategy(CookieStrategy strategy)接口来设置Cookie缓存模式。
 
+#### Cookie拦截器
+Cookie拦截器用来拦截请求和响应获取到的Cookie列表，从而实现添加自定义Cookie的功能。
+```
+fastWebView.addRequestCookieInterceptor(CookieInterceptor interceptor);
+fastWebView.addResponseCookieInterceptor(CookieInterceptor interceptor);
+```
 ### 执行JS脚本
 
 ```
 fastWebView.runJs(String function, Object... args);
 ```
 
-### 首次加载
-首次加载需要完整加载整个H5页面，所以加载速度跟普通webview一样，如果想提高首次加载速度，可以使用preload来预加载页面。
+### 预加载
+由于首次加载资源时，需要完整加载整个H5页面，加载速度跟原生webview无异。但我们可以使用preload来预加载页面。
 ```
 FastWebView.preload(Context context, String url)
 ```
 
-## 原理
+## 原理设计图
 
 ![readme](readme.png)
