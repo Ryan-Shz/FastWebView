@@ -17,6 +17,7 @@ public class CacheRequest {
     private boolean forceMode;
     private Map<String, String> mHeaders;
     private String mUserAgent;
+    private int mWebViewCacheMode;
 
     public String getKey() {
         return key;
@@ -61,6 +62,14 @@ public class CacheRequest {
     public void setUrl(String url) {
         this.url = url;
         this.key = generateKey(url);
+    }
+
+    public void setWebViewCacheMode(int webViewCacheMode) {
+        this.mWebViewCacheMode = webViewCacheMode;
+    }
+
+    public int getWebViewCacheMode() {
+        return mWebViewCacheMode;
     }
 
     private static String generateKey(String url) {

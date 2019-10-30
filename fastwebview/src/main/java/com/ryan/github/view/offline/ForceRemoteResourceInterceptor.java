@@ -29,8 +29,7 @@ public class ForceRemoteResourceInterceptor implements Destroyable, ResourceInte
         CacheRequest request = chain.getRequest();
         String mime = request.getMime();
         boolean isFilter = TextUtils.isEmpty(mime) || mMimeTypeFilter.isFilter(mime);
-        SourceRequest sourceRequest = new SourceRequest(request.getUrl(), isFilter, request.getHeaders());
-        sourceRequest.setUserAgent(request.getUserAgent());
+        SourceRequest sourceRequest = new SourceRequest(request, isFilter);
         WebResource resource = mResourceLoader.getResource(sourceRequest);
         if (resource != null) {
             return resource;

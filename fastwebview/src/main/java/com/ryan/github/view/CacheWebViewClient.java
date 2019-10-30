@@ -26,6 +26,11 @@ class CacheWebViewClient extends WebViewClient {
 
     private WebViewClient mDelegate;
     private WebViewCache mWebViewCache;
+    private int mWebViewCacheMode;
+
+    CacheWebViewClient(int cacheMode) {
+        mWebViewCacheMode = cacheMode;
+    }
 
     void updateProxyClient(WebViewClient webViewClient) {
         mDelegate = webViewClient;
@@ -237,7 +242,7 @@ class CacheWebViewClient extends WebViewClient {
                 return response;
             }
         }
-        return mWebViewCache.getResource(request.getUrl().toString());
+        return loadFromWebViewCache(request.getUrl().toString());
     }
 
     private WebResourceResponse onIntercept(WebView view, String url) {
@@ -247,7 +252,11 @@ class CacheWebViewClient extends WebViewClient {
                 return response;
             }
         }
-        return mWebViewCache.getResource(url);
+        return loadFromWebViewCache(url);
+    }
+
+    private WebResourceResponse loadFromWebViewCache(String url) {
+        return mWebViewCache.getResource(url, mWebViewCacheMode);
     }
 
 }

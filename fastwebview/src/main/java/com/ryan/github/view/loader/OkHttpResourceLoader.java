@@ -2,6 +2,7 @@ package com.ryan.github.view.loader;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.webkit.WebSettings;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
@@ -13,6 +14,7 @@ import com.ryan.github.view.webview.BuildConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
@@ -42,9 +44,12 @@ public class OkHttpResourceLoader implements ResourceLoader {
         LogUtils.d(String.format("load url: %s", url));
         boolean isCacheByOkHttp = sourceRequest.isCacheable();
         OkHttpClient client = OkHttpClientProvider.get(mContext);
+        CacheControl cacheControl;
         CacheControl.Builder builder = new CacheControl.Builder();
-        if (!isCacheByOkHttp) {
-            builder.noStore();
+        if (isCacheByOkHttp) {
+            cacheControl = getCacheControl(sourceRequest.getWebViewCache());
+        } else {
+            cacheControl = builder.noStore().build();
         }
         String userAgent = sourceRequest.getUserAgent();
         if (TextUtils.isEmpty(userAgent)) {
@@ -66,7 +71,7 @@ public class OkHttpResourceLoader implements ResourceLoader {
         }
         Request request = requestBuilder
                 .url(url)
-                .cacheControl(builder.build())
+                .cacheControl(cacheControl)
                 .get()
                 .build();
         Response response;
@@ -91,5 +96,20 @@ public class OkHttpResourceLoader implements ResourceLoader {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private CacheControl getCacheControl(int webViewCacheMode) {
+        switch (webViewCacheMode) {
+            case WebSettings.LOAD_CACHE_ONLY:
+                return CacheControl.FORCE_CACHE;
+            case WebSettings.LOAD_NO_CACHE:
+                return CacheControl.FORCE_NETWORK;
+            case WebSettings.LOAD_CACHE_ELSE_NETWORK:
+                CacheControl.Builder builder = new CacheControl.Builder();
+                builder.maxStale(Integer.MAX_VALUE, TimeUnit.DAYS);
+                return builder.build();
+            default:
+                return new CacheControl.Builder().build();
+        }
     }
 }

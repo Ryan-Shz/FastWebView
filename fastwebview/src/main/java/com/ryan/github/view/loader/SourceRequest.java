@@ -1,5 +1,7 @@
 package com.ryan.github.view.loader;
 
+import com.ryan.github.view.offline.CacheRequest;
+
 import java.util.Map;
 
 /**
@@ -12,15 +14,14 @@ public class SourceRequest {
     private boolean cacheable;
     private Map<String, String> headers;
     private String userAgent;
+    private int webViewCache;
 
-    public SourceRequest(String url) {
-        this.url = url;
-    }
-
-    public SourceRequest(String url, boolean cacheable, Map<String, String> headers) {
-        this.url = url;
+    public SourceRequest(CacheRequest request, boolean cacheable){
         this.cacheable = cacheable;
-        this.headers = headers;
+        this.url = request.getUrl();
+        this.headers = request.getHeaders();
+        this.userAgent = request.getUserAgent();
+        this.webViewCache = request.getWebViewCacheMode();
     }
 
     public String getUrl() {
@@ -53,5 +54,13 @@ public class SourceRequest {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public int getWebViewCache() {
+        return webViewCache;
+    }
+
+    public void setWebViewCache(int webViewCache) {
+        this.webViewCache = webViewCache;
     }
 }

@@ -35,7 +35,7 @@ public class WebViewCacheImpl implements WebViewCache {
     }
 
     @Override
-    public WebResourceResponse getResource(String url) {
+    public WebResourceResponse getResource(String url, int cacheMode) {
         if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
             return null;
         }
@@ -46,6 +46,7 @@ public class WebViewCacheImpl implements WebViewCache {
         request.setMime(mimeType);
         request.setForceMode(mForceMode);
         request.setUserAgent(mUserAgent);
+        request.setWebViewCacheMode(cacheMode);
         Map<String, String> headers = mHeaders.get(formatUrl(url));
         request.setHeaders(headers);
         return mOfflineServer.get(request);

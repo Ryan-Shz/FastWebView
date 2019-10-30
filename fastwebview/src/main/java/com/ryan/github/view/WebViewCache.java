@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface WebViewCache {
 
-    WebResourceResponse getResource(String url);
+    WebResourceResponse getResource(String url, int webViewCacheMode);
 
     void destroyResource();
 

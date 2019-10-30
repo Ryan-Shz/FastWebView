@@ -1,6 +1,7 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
+import android.webkit.WebSettings;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.loader.OkHttpResourceLoader;
@@ -22,8 +23,7 @@ public class DefaultRemoteResourceInterceptor implements ResourceInterceptor {
     @Override
     public WebResource load(Chain chain) {
         CacheRequest request = chain.getRequest();
-        SourceRequest sourceRequest = new SourceRequest(request.getUrl(), true, request.getHeaders());
-        sourceRequest.setUserAgent(request.getUserAgent());
+        SourceRequest sourceRequest = new SourceRequest(request, true);
         WebResource resource = mResourceLoader.getResource(sourceRequest);
         if (resource != null) {
             return resource;
