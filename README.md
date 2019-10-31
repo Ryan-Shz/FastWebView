@@ -1,18 +1,23 @@
 # FastWebView
+## 背景
+Android原生WebView有磁盘缓存最大上限，在4.4之前只有10M，在4.4及其之后虽然提升至20M，但对频繁的H5业务场景来说，还是太小了。我们有很多业务界面使用H5实现，在使用正常HTTP缓存协议对资源缓存时，
+太小的缓存空间很容易导致页面缓存被清除，从而重新加载。不仅浪费用户的流量，加载速度慢也会造成不好的用户体验。FastWebView旨在解决这些痛点，通过自定义本地缓存的方式，
+不仅突破了原生WebView缓存大小限制，还可以让开发者随心所欲的定制本地缓存大小，支持预加载和离线加载，并友好的支持离线包方案，可以大幅提升H5加载速度。在项目实践数据证明，优化效果达到40%以上。
 ## 特性
-1. 自定义本地缓存，突破原生webview缓存上限限制
-2. 提供默认和强制两种缓存模式，并支持http缓存协议
-3. 自定义拦截器支持自定义读取静态资源（比如读取assets中的资源）
+1. 自定义本地缓存，突破原生webview缓存限制
+2. 提供默认和强制两种缓存模式，支持http缓存协议
+3. 提供资源拦截器支持自定义读取静态资源（比如读取assets/sdcard中的资源替换在线资源）
 4. 支持离线加载/预加载
-5. 大幅提高WebView加载速度
-6. cookie自动缓存（提供两种缓存模式：内存缓存或持久缓存）和发布
+5. cookie自动缓存和发布
 
 ## 使用方法
-将原生的WebView替换为FastWebView即可。FastWebView提供以下两种缓存模式，且均需要手动开启，若未主动开启，则FastWebView和原生webview无任何差异。
+将原生的WebView替换为FastWebView即可。
+
+> 注意：FastWebView提供以下两种缓存模式，且均需要手动开启，若未主动开启，则FastWebView和原生webview无任何差异, 不会有任何的代码侵入。
 
 ### 默认缓存模式
 
-使用默认模式时，默认的网络请求方式由HttpUrlConnection修改为okhttp，并提升webview默认缓存大小上限为100MB。
+使用默认模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，默认缓存上限提升为100MB。
 
 #### 开启方式
 
@@ -30,9 +35,9 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.openForceCache();
 ```
 
-使用强制缓存模式时，FastWebView会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
+> 注意：使用强制缓存模式时，FastWebView会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
-默认的过滤器会过滤所有音视频和html等资源类型：（即以下类型的资源不会被缓存）
+默认的过滤器会过滤所有音视频和**html**等资源类型：（即以下类型的资源不会被缓存）
 
 ```
 public DefaultMimeTypeFilter() {
@@ -76,8 +81,6 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 2. setExtensionFilter(ExtensionFilter filter) 设置资源类型过滤器
 3. setVersion(int version) 设置缓存版本，默认为1
 4. setDiskCacheSize(long diskCacheSize) 设置磁盘缓存上限大小
-5. setMemoryCacheEnable(boolean enable) 设置是否打开内存缓存，默认为true
-6. setMaxMemoryCacheSize(int maxMemoryCacheSize) 设置内存缓存上限大小
 
 ### 如何更新静态资源？
 
