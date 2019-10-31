@@ -1,6 +1,5 @@
 # FastWebView
 ## 特性
-
 1. 自定义本地缓存，突破原生webview缓存上限限制
 2. 提供默认和强制两种缓存模式，并支持http缓存协议
 3. 自定义拦截器支持自定义读取静态资源（比如读取assets中的资源）
@@ -9,7 +8,7 @@
 6. cookie自动缓存（提供两种缓存模式：内存缓存或持久缓存）和发布
 
 ## 使用方法
-将原生的WebView替换为fastwebview即可。fastwebview提供以下两种缓存模式，且均需要手动开启，若未主动开启，则fastwebview和原生webview无任何差异。
+将原生的WebView替换为FastWebView即可。FastWebView提供以下两种缓存模式，且均需要手动开启，若未主动开启，则FastWebView和原生webview无任何差异。
 
 ### 默认缓存模式
 
@@ -31,7 +30,7 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.openForceCache();
 ```
 
-使用强制缓存模式时，fastwebview会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
+使用强制缓存模式时，FastWebView会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
 默认的过滤器会过滤所有音视频和html等资源类型：（即以下类型的资源不会被缓存）
 
@@ -70,8 +69,6 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
         .setExtensionFilter(ExtensionFilter filter)
         .setVersion(int version)
         .setDiskCacheSize(long diskCacheSize)
-        .setMaxMemoryCacheSize(int maxMemoryCacheSize)
-        .setMemoryCacheEnable(boolean enable)
         .build());
 ```
 
@@ -86,7 +83,7 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 
 由于FastWebView的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
 
-所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，fastwebview会重新从网络下载。
+所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，FastWebView会重新从网络下载。
 
 ### 添加资源加载拦截器
 

@@ -35,17 +35,7 @@ public class OfflineServerImpl implements OfflineServer {
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
                 interceptors.addAll(mBaseInterceptorList);
             }
-            if (cacheConfig.isMemoryCacheEnable()) {
-                MemoryCacheInterceptor interceptor = MemoryCacheInterceptor.getInstance();
-                if (cacheConfig.getMaxMemoryCacheSize() > 0) {
-                    interceptor.setMaxMemorySize(cacheConfig.getMaxMemoryCacheSize());
-                }
-                interceptors.add(MemoryCacheInterceptor.getInstance());
-            }
             interceptors.add(new DiskResourceInterceptor(cacheConfig));
-            if (cacheConfig.isMemoryCacheEnable()) {
-                interceptors.add(new PresetInterceptor());
-            }
             interceptors.add(new ForceRemoteResourceInterceptor(context, cacheConfig));
             mForceModeChainList = interceptors;
         }
