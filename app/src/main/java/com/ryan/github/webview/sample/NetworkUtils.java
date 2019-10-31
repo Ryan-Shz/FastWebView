@@ -1,4 +1,4 @@
-package com.ryan.github.view.utils;
+package com.ryan.github.webview.sample;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

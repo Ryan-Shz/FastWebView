@@ -4,14 +4,12 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.ryan.github.view.cookie.CookieInterceptor;
 import com.ryan.github.view.cookie.CookieConfigManager;
 import com.ryan.github.view.cookie.CookieStrategy;
-import com.ryan.github.view.utils.NetworkUtils;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
 import java.util.Map;
@@ -26,7 +24,6 @@ public class FastWebView extends WebView {
     private CacheWebViewClient mCacheWebViewClient;
     private WebViewClient mUserWebViewClient;
     private CookieConfigManager mCookieManager;
-    private int mCacheMode = WebSettings.LOAD_DEFAULT;
 
     public FastWebView(Context context) {
         this(context, null);
@@ -68,13 +65,8 @@ public class FastWebView extends WebView {
         super.destroy();
     }
 
-    private void initCache() {
-        initCacheMode();
-        setCacheConfig(null);
-    }
-
     public void setCacheConfig(CacheConfig cacheConfig) {
-        mCacheWebViewClient = new CacheWebViewClient(mCacheMode);
+        mCacheWebViewClient = new CacheWebViewClient(getSettings().getCacheMode());
         mWebViewCache = new WebViewCacheImpl(getContext(), cacheConfig);
         mCacheWebViewClient.setWebViewCache(mWebViewCache);
         if (mUserWebViewClient != null) {
@@ -84,12 +76,12 @@ public class FastWebView extends WebView {
     }
 
     public void openForceCache() {
-        initCache();
+        setCacheConfig(null);
         mWebViewCache.openForceMode();
     }
 
     public void openDefaultCache() {
-        initCache();
+        setCacheConfig(null);
     }
 
     @Override
@@ -138,13 +130,6 @@ public class FastWebView extends WebView {
 
     private void runJs(String script) {
         this.loadUrl(script);
-    }
-
-    private void initCacheMode() {
-        WebSettings webSettings = getSettings();
-        mCacheMode = NetworkUtils.isAvailable(getContext()) ?
-                WebSettings.LOAD_DEFAULT : WebSettings.LOAD_CACHE_ONLY;
-        webSettings.setCacheMode(mCacheMode);
     }
 
     @Override

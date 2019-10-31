@@ -13,6 +13,7 @@ import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +22,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+
+import static android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK;
+import static android.webkit.WebSettings.LOAD_CACHE_ONLY;
+import static android.webkit.WebSettings.LOAD_NO_CACHE;
+import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
+import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * load remote resources using okhttp.
@@ -44,13 +51,7 @@ public class OkHttpResourceLoader implements ResourceLoader {
         LogUtils.d(String.format("load url: %s", url));
         boolean isCacheByOkHttp = sourceRequest.isCacheable();
         OkHttpClient client = OkHttpClientProvider.get(mContext);
-        CacheControl cacheControl;
-        CacheControl.Builder builder = new CacheControl.Builder();
-        if (isCacheByOkHttp) {
-            cacheControl = getCacheControl(sourceRequest.getWebViewCache());
-        } else {
-            cacheControl = builder.noStore().build();
-        }
+        CacheControl cacheControl = getCacheControl(sourceRequest.getWebViewCache(), isCacheByOkHttp);
         String userAgent = sourceRequest.getUserAgent();
         if (TextUtils.isEmpty(userAgent)) {
             userAgent = DEFAULT_USER_AGENT;
@@ -78,13 +79,13 @@ public class OkHttpResourceLoader implements ResourceLoader {
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
-            if (response.code() == 200 || response.code() == 304) {
+            if (response.code() == HTTP_OK || response.code() == HTTP_NOT_MODIFIED) {
                 ResponseBody responseBody = response.body();
                 if (responseBody != null) {
                     InputStream is = responseBody.byteStream();
                     remoteResource.setResponseCode(response.code());
                     remoteResource.setReasonPurase(response.message());
-                    remoteResource.setModified(response.code() != 304);
+                    remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
                     ReusableInputStream inputStream = new ReusableInputStream(is);
                     remoteResource.setInputStream(inputStream);
                     remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
@@ -98,18 +99,26 @@ public class OkHttpResourceLoader implements ResourceLoader {
         return null;
     }
 
-    private CacheControl getCacheControl(int webViewCacheMode) {
+    private CacheControl getCacheControl(int webViewCacheMode, boolean isCacheByOkHttp) {
+        // return the appropriate cache-control according to webview cache mode.
         switch (webViewCacheMode) {
-            case WebSettings.LOAD_CACHE_ONLY:
+            case LOAD_CACHE_ONLY:
                 return CacheControl.FORCE_CACHE;
-            case WebSettings.LOAD_NO_CACHE:
+            case LOAD_CACHE_ELSE_NETWORK:
+                if (!isCacheByOkHttp) {
+                    // if it happens, because there is no local cache.
+                    return createNoStoreCacheControl();
+                }
+                // tell okhttp that we are willing to receive expired cache.
+                return new CacheControl.Builder().maxStale(Integer.MAX_VALUE, TimeUnit.SECONDS).build();
+            case LOAD_NO_CACHE:
                 return CacheControl.FORCE_NETWORK;
-            case WebSettings.LOAD_CACHE_ELSE_NETWORK:
-                CacheControl.Builder builder = new CacheControl.Builder();
-                builder.maxStale(Integer.MAX_VALUE, TimeUnit.DAYS);
-                return builder.build();
-            default:
-                return new CacheControl.Builder().build();
+            default: // LOAD_DEFAULT
+                return isCacheByOkHttp ? new CacheControl.Builder().build() : createNoStoreCacheControl();
         }
+    }
+
+    private CacheControl createNoStoreCacheControl() {
+        return new CacheControl.Builder().noStore().build();
     }
 }

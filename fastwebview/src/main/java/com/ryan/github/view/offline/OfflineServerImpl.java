@@ -30,7 +30,8 @@ public class OfflineServerImpl implements OfflineServer {
 
     private List<ResourceInterceptor> buildForceModeChain(Context context, CacheConfig cacheConfig) {
         if (mForceModeChainList == null) {
-            List<ResourceInterceptor> interceptors = new ArrayList<>();
+            int interceptorsCount = 1 + getBaseInterceptorsCount();
+            List<ResourceInterceptor> interceptors = new ArrayList<>(interceptorsCount);
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
                 interceptors.addAll(mBaseInterceptorList);
             }
@@ -53,7 +54,8 @@ public class OfflineServerImpl implements OfflineServer {
 
     private List<ResourceInterceptor> buildDefaultModeChain(Context context) {
         if (mDefaultModeChainList == null) {
-            List<ResourceInterceptor> interceptors = new ArrayList<>();
+            int interceptorsCount = 1 + getBaseInterceptorsCount();
+            List<ResourceInterceptor> interceptors = new ArrayList<>(interceptorsCount);
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
                 interceptors.addAll(mBaseInterceptorList);
             }
@@ -101,5 +103,9 @@ public class OfflineServerImpl implements OfflineServer {
                 ((Destroyable) interceptor).destroy();
             }
         }
+    }
+
+    private int getBaseInterceptorsCount() {
+        return mBaseInterceptorList == null ? 0 : mBaseInterceptorList.size();
     }
 }
