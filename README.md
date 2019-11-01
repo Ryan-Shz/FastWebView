@@ -133,7 +133,7 @@ CookieStrategy.PERSISTENT; // 持久缓存模式
 
 ```
 FastCookieManager cookieManager = fastView.getFastCookieManager();
-cookieManager.setCookieStrategy(CookieStrategy strategy)
+cookieManager.setCookieStrategy(CookieStrategy strategy);
 ```
 
 #### Cookie拦截器
