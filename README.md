@@ -157,4 +157,4 @@ FastWebView.preload(Context context, String url)
 
 ## 原理设计图
 
-![design](readme.png)
+![设计图](design.png)
