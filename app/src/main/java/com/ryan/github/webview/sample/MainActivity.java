@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.google.gson.Gson;
+import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.cookie.CookieInterceptor;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(fastWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        fastWebView.openForceCache();
+        fastWebView.setCacheMode(FastCacheMode.FORCE);
         fastWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
             public WebResource load(Chain chain) {

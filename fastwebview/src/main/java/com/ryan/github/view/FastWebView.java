@@ -7,21 +7,20 @@ import android.view.ViewParent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.cookie.CookieInterceptor;
 import com.ryan.github.view.cookie.CookieConfigManager;
 import com.ryan.github.view.cookie.CookieStrategy;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
-import java.util.Map;
-
 /**
  * Created by Ryan
  * 2018/2/7 下午3:33
  */
-public class FastWebView extends WebView {
+public class FastWebView extends WebView implements FastOpenApi {
 
-    private WebViewCache mWebViewCache;
-    private CacheWebViewClient mCacheWebViewClient;
+    private InnerFastClient mFastClient;
     private WebViewClient mUserWebViewClient;
     private CookieConfigManager mCookieManager;
 
@@ -40,8 +39,8 @@ public class FastWebView extends WebView {
 
     @Override
     public void setWebViewClient(WebViewClient client) {
-        if (mCacheWebViewClient != null) {
-            mCacheWebViewClient.updateProxyClient(client);
+        if (mFastClient != null) {
+            mFastClient.updateProxyClient(client);
         } else {
             super.setWebViewClient(client);
         }
@@ -58,52 +57,42 @@ public class FastWebView extends WebView {
         if (viewParent != null && viewParent instanceof ViewGroup) {
             ((ViewGroup) viewParent).removeView(this);
         }
-        if (mWebViewCache != null) {
-            mWebViewCache.destroyResource();
+        if (mFastClient != null) {
+            mFastClient.destroy();
         }
         mCookieManager.clear();
         super.destroy();
-    }
-
-    public void setCacheConfig(CacheConfig cacheConfig) {
-        mCacheWebViewClient = new CacheWebViewClient(getSettings().getCacheMode());
-        mWebViewCache = new WebViewCacheImpl(getContext(), cacheConfig);
-        mCacheWebViewClient.setWebViewCache(mWebViewCache);
-        if (mUserWebViewClient != null) {
-            mCacheWebViewClient.updateProxyClient(mUserWebViewClient);
-        }
-        super.setWebViewClient(mCacheWebViewClient);
-    }
-
-    public void openForceCache() {
-        setCacheConfig(null);
-        mWebViewCache.openForceMode();
-    }
-
-    public void openDefaultCache() {
-        setCacheConfig(null);
-    }
-
-    @Override
-    public void loadUrl(String url) {
-        loadUrl(url, null);
-    }
-
-    @Override
-    public void loadUrl(String url, Map<String, String> additionalHttpHeaders) {
-        if (mWebViewCache != null) {
-            mWebViewCache.setUserAgent(getSettings().getUserAgentString());
-            mWebViewCache.addHeader(url, additionalHttpHeaders);
-        }
-        super.loadUrl(url, additionalHttpHeaders);
     }
 
     public static void preload(Context context, String url) {
         new FastWebView(context.getApplicationContext()).loadUrl(url);
     }
 
+    public void setCacheMode(FastCacheMode mode) {
+        setCacheMode(mode, null);
+    }
+
+    @Override
+    public void setCacheMode(FastCacheMode mode, CacheConfig cacheConfig) {
+        if (mode == FastCacheMode.DEFAULT) {
+            mFastClient = null;
+            if (mUserWebViewClient != null) {
+                setWebViewClient(mUserWebViewClient);
+            }
+        } else {
+            mFastClient = new InnerFastClient(this);
+            if (mUserWebViewClient != null) {
+                mFastClient.updateProxyClient(mUserWebViewClient);
+            }
+            mFastClient.setCacheMode(mode, cacheConfig);
+            super.setWebViewClient(mFastClient);
+        }
+    }
+
     public void addResourceInterceptor(ResourceInterceptor interceptor) {
-        mWebViewCache.addResourceInterceptor(interceptor);
+        if (mFastClient != null) {
+            mFastClient.addResourceInterceptor(interceptor);
+        }
     }
 
     public void runJs(String function, Object... args) {

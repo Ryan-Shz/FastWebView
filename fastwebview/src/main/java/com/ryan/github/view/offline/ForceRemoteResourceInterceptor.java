@@ -3,8 +3,8 @@ package com.ryan.github.view.offline;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.ryan.github.view.CacheConfig;
-import com.ryan.github.view.MimeTypeFilter;
+import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.config.MimeTypeFilter;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.loader.OkHttpResourceLoader;
 import com.ryan.github.view.loader.ResourceLoader;

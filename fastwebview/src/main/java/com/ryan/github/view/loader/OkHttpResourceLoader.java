@@ -2,18 +2,16 @@ package com.ryan.github.view.loader;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.webkit.WebSettings;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
 import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
-import com.ryan.github.view.ReusableInputStream;
+import com.ryan.github.view.utils.ReusableInputStream;
 import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +82,7 @@ public class OkHttpResourceLoader implements ResourceLoader {
                 if (responseBody != null) {
                     InputStream is = responseBody.byteStream();
                     remoteResource.setResponseCode(response.code());
-                    remoteResource.setReasonPurase(response.message());
+                    remoteResource.setReasonPhrase(response.message());
                     remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
                     ReusableInputStream inputStream = new ReusableInputStream(is);
                     remoteResource.setInputStream(inputStream);

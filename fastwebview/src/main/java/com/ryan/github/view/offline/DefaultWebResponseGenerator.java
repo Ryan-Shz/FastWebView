@@ -6,9 +6,6 @@ import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

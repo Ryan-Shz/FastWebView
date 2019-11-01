@@ -3,7 +3,7 @@ package com.ryan.github.view.offline;
 import android.content.Context;
 import android.webkit.WebResourceResponse;
 
-import com.ryan.github.view.CacheConfig;
+import com.ryan.github.view.config.CacheConfig;
 import com.ryan.github.view.WebResource;
 
 import java.util.ArrayList;

@@ -1,7 +1,8 @@
 package com.ryan.github.view;
 
+import com.ryan.github.view.utils.ReusableInputStream;
+
 import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,7 +73,7 @@ public class WebResource {
         return originBytes;
     }
 
-    public void setReasonPurase(String reasonPhrase) {
+    public void setReasonPhrase(String reasonPhrase) {
         this.reasonPhrase = reasonPhrase;
     }
 

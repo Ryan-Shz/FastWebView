@@ -1,7 +1,6 @@
 package com.ryan.github.view.offline;
 
 import android.content.Context;
-import android.webkit.WebSettings;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.loader.OkHttpResourceLoader;

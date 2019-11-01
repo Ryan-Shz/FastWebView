@@ -1,9 +1,12 @@
 package com.ryan.github.view;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
+import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.config.DefaultMimeTypeFilter;
+import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.offline.CacheRequest;
 import com.ryan.github.view.offline.OfflineServer;
 import com.ryan.github.view.offline.OfflineServerImpl;
@@ -13,7 +16,6 @@ import com.ryan.github.view.utils.MimeTypeMapUtils;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Ryan
@@ -23,77 +25,77 @@ public class WebViewCacheImpl implements WebViewCache {
 
     private static final String CACHE_DIR_NAME = "cached_webview_force";
     private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
-    private boolean mForceMode = false;
-    private Map<String, Map<String, String>> mHeaders;
+    private FastCacheMode mFastCacheMode;
+    private CacheConfig mCacheConfig;
     private OfflineServer mOfflineServer;
-    private String mUserAgent;
+    private Context mContext;
 
-    WebViewCacheImpl(Context context, CacheConfig cacheConfig) {
-        mHeaders = new ConcurrentHashMap<>();
-        cacheConfig = generateCacheConfig(context, cacheConfig);
-        mOfflineServer = new OfflineServerImpl(context, cacheConfig);
+    WebViewCacheImpl(Context context) {
+        mContext = context;
     }
 
     @Override
-    public WebResourceResponse getResource(String url, int cacheMode) {
-        if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
-            return null;
+    public WebResourceResponse getResource(WebResourceRequest webResourceRequest, int cacheMode, String userAgent) {
+        if (mFastCacheMode == FastCacheMode.DEFAULT) {
+            throw new IllegalStateException("an error occurred.");
         }
-        String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
-        String mimeType = MimeTypeMapUtils.getMimeTypeFromExtension(extension);
-        CacheRequest request = new CacheRequest();
-        request.setUrl(url);
-        request.setMime(mimeType);
-        request.setForceMode(mForceMode);
-        request.setUserAgent(mUserAgent);
-        request.setWebViewCacheMode(cacheMode);
-        Map<String, String> headers = mHeaders.get(formatUrl(url));
-        request.setHeaders(headers);
-        return mOfflineServer.get(request);
-    }
-
-    @Override
-    public void destroyResource() {
-        mOfflineServer.destroy();
-    }
-
-    @Override
-    public void addHeader(String url, Map<String, String> header) {
-        if (TextUtils.isEmpty(url) || header == null || header.isEmpty()) {
-            return;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            String url = webResourceRequest.getUrl().toString();
+            String extension = MimeTypeMapUtils.getFileExtensionFromUrl(url);
+            String mimeType = MimeTypeMapUtils.getMimeTypeFromExtension(extension);
+            CacheRequest cacheRequest = new CacheRequest();
+            cacheRequest.setUrl(url);
+            cacheRequest.setMime(mimeType);
+            cacheRequest.setForceMode(mFastCacheMode == FastCacheMode.FORCE);
+            cacheRequest.setUserAgent(userAgent);
+            cacheRequest.setWebViewCacheMode(cacheMode);
+            Map<String, String> headers = webResourceRequest.getRequestHeaders();
+            cacheRequest.setHeaders(headers);
+            return getOfflineServer().get(cacheRequest);
         }
-        mHeaders.put(formatUrl(url), header);
+        throw new IllegalStateException("an error occurred.");
     }
 
     @Override
-    public void setUserAgent(String userAgent) {
-        mUserAgent = userAgent;
-    }
-
-    @Override
-    public void openForceMode() {
-        mForceMode = true;
+    public void setCacheMode(FastCacheMode mode, CacheConfig cacheConfig) {
+        mFastCacheMode = mode;
+        mCacheConfig = cacheConfig;
     }
 
     @Override
     public void addResourceInterceptor(ResourceInterceptor interceptor) {
-        mOfflineServer.addResourceInterceptor(interceptor);
+        getOfflineServer().addResourceInterceptor(interceptor);
     }
 
-    private String formatUrl(String url) {
-        return url.replaceAll("/+$", "");
-    }
-
-    private CacheConfig generateCacheConfig(Context context, CacheConfig userConfig) {
-        if (userConfig != null) {
-            return userConfig;
+    private synchronized OfflineServer getOfflineServer() {
+        if (mOfflineServer == null) {
+            mOfflineServer = new OfflineServerImpl(mContext, getCacheConfig());
         }
-        String dir = context.getCacheDir() + File.separator + CACHE_DIR_NAME;
+        return mOfflineServer;
+    }
+
+    private CacheConfig getCacheConfig() {
+        return mCacheConfig != null ? mCacheConfig : generateDefaultCacheConfig();
+    }
+
+    private CacheConfig generateDefaultCacheConfig() {
+        String dir = mContext.getCacheDir() + File.separator + CACHE_DIR_NAME;
         return new CacheConfig.Builder()
                 .setExtensionFilter(new DefaultMimeTypeFilter())
                 .setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE)
-                .setVersion(AppVersionUtil.getVersionCode(context))
+                .setVersion(AppVersionUtil.getVersionCode(mContext))
                 .setCacheDir(dir)
                 .build();
+    }
+
+    @Override
+    public void destroy() {
+        if (mOfflineServer != null) {
+            mOfflineServer.destroy();
+        }
+        // help gc
+        mCacheConfig = null;
+        mOfflineServer = null;
+        mContext = null;
     }
 }

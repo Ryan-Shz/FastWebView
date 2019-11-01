@@ -3,11 +3,11 @@ package com.ryan.github.view.offline;
 import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
-import com.ryan.github.view.CacheConfig;
-import com.ryan.github.view.lru.DiskLruCache;
+import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.utils.lru.DiskLruCache;
 import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
-import com.ryan.github.view.ReusableInputStream;
+import com.ryan.github.view.utils.ReusableInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                 InputStream inputStream = snapshot.getInputStream(ENTRY_BODY);
                 if (inputStream != null) {
                     WebResource webResource = new WebResource();
-                    webResource.setReasonPurase(reasonPhrase);
+                    webResource.setReasonPhrase(reasonPhrase);
                     webResource.setResponseCode(Integer.valueOf(responseCode));
                     webResource.setInputStream(new ReusableInputStream(inputStream));
                     webResource.setResponseHeaders(headers);
