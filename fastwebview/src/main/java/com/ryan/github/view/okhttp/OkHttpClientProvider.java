@@ -2,12 +2,7 @@ package com.ryan.github.view.okhttp;
 
 import android.content.Context;
 
-import com.ryan.github.view.cookie.CookieConfigManager;
-import com.ryan.github.view.cookie.CookieJarImpl;
-import com.ryan.github.view.cookie.CookieStore;
-import com.ryan.github.view.cookie.CookieStrategy;
-import com.ryan.github.view.cookie.MemoryCookieStore;
-import com.ryan.github.view.cookie.PersistentCookieStore;
+import com.ryan.github.view.cookie.FastCookieManager;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -31,10 +26,9 @@ public class OkHttpClientProvider {
 
     private void ensureOkHttpClientCreated(Context context) {
         if (mClient == null) {
-            CookieStore cookieStore = getCookieStore(context);
             String dir = context.getCacheDir() + File.separator + CACHE_OKHTTP_DIR_NAME;
             mClient = new OkHttpClient.Builder()
-                    .cookieJar(new CookieJarImpl(cookieStore))
+                    .cookieJar(FastCookieManager.getInstance().getCookieJar(context))
                     .cache(new Cache(new File(dir), OKHTTP_CACHE_SIZE))
                     .readTimeout(20, TimeUnit.SECONDS)
                     .writeTimeout(20, TimeUnit.SECONDS)
@@ -50,16 +44,6 @@ public class OkHttpClientProvider {
     public static OkHttpClient get(Context context) {
         SingletonHolder.INSTANCE.ensureOkHttpClientCreated(context);
         return SingletonHolder.INSTANCE.mClient;
-    }
-
-    private CookieStore getCookieStore(Context context) {
-        CookieStore cookieStore;
-        if (CookieConfigManager.getInstance().getCookieStrategy() == CookieStrategy.PERSISTENT) {
-            cookieStore = new PersistentCookieStore(context);
-        } else {
-            cookieStore = new MemoryCookieStore();
-        }
-        return cookieStore;
     }
 
 }

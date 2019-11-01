@@ -40,14 +40,14 @@ fastWebView.setCacheMode(FastCacheMode.NORMAL);
 
 ### 强制缓存模式
 
-使用强制缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，并且FastWebView会无视http缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
+使用强制缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，并且FastWebView会无视HTTP缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
 ```
 FastWebView fastWebView = new FastWebView(this);
 fastWebView.setCacheMode(FastCacheMode.FORCE, cacheConfig);
 ```
 
-默认的过滤器会过滤所有音视频和**html**等资源类型：（即以下类型的资源不会被缓存，但支持Http缓存协议缓存）
+默认的过滤器会过滤所有音视频和**html**等资源类型：（即以下类型的资源不会被缓存，但支持HTTP缓存协议）
 
 ```
 public DefaultMimeTypeFilter() {
@@ -129,13 +129,19 @@ FastWebView实现了Cookie的自动缓存，并提供了以下两种缓存模式
 CookieStrategy.MEMORY; // 内存缓存模式
 CookieStrategy.PERSISTENT; // 持久缓存模式
 ```
-可以通过fastWebView.setCookieStrategy(CookieStrategy strategy)接口来设置Cookie缓存模式。
+可以通过以下方式来设置Cookie缓存模式：
+
+```
+FastCookieManager cookieManager = fastView.getFastCookieManager();
+cookieManager.setCookieStrategy(CookieStrategy strategy)
+```
 
 #### Cookie拦截器
-Cookie拦截器用来拦截请求和响应获取到的Cookie列表，从而实现添加自定义Cookie的功能。
+Cookie拦截器用来拦截请求和响应获取到的Cookie列表，从而实现添加自定义Cookie的功能：
 ```
-fastWebView.addRequestCookieInterceptor(CookieInterceptor interceptor);
-fastWebView.addResponseCookieInterceptor(CookieInterceptor interceptor);
+FastCookieManager cookieManager = fastView.getFastCookieManager();
+cookieManager.addRequestCookieInterceptor(CookieInterceptor interceptor);
+cookieManager.addResponseCookieInterceptor(CookieInterceptor interceptor);
 ```
 ### 执行JS脚本
 

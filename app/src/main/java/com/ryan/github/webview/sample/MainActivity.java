@@ -18,6 +18,7 @@ import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.cookie.CookieInterceptor;
 import com.ryan.github.view.cookie.CookieStrategy;
+import com.ryan.github.view.cookie.FastCookieManager;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDisplayZoomControls(false);
         webSettings.setDefaultTextEncodingName("UTF-8");
         webSettings.setBlockNetworkImage(true);
+
         // 设置正确的cache mode以支持离线加载
         int cacheMode = NetworkUtils.isAvailable(this) ?
                 WebSettings.LOAD_DEFAULT : WebSettings.LOAD_CACHE_ELSE_NETWORK;
@@ -93,8 +95,9 @@ public class MainActivity extends AppCompatActivity {
         cookieManager.setCookie(url, "custom=12345678910;");
         CookieSyncManager.getInstance().sync();
 
-        fastWebView.setCookieStrategy(CookieStrategy.PERSISTENT);
-        fastWebView.setRequestCookieInterceptor(new CookieInterceptor() {
+        FastCookieManager fastCookieManager = fastWebView.getFastCookieManager();
+        fastCookieManager.setCookieStrategy(CookieStrategy.PERSISTENT);
+        fastCookieManager.setRequestCookieInterceptor(new CookieInterceptor() {
             @Override
             public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
                 for (Cookie cookie : originCookies) {
@@ -103,8 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 return originCookies;
             }
         });
-
-        fastWebView.setResponseCookieInterceptor(new CookieInterceptor() {
+        fastCookieManager.setResponseCookieInterceptor(new CookieInterceptor() {
             @Override
             public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
                 for (Cookie cookie : originCookies) {

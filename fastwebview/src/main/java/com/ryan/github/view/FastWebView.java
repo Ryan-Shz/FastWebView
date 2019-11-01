@@ -9,9 +9,7 @@ import android.webkit.WebViewClient;
 
 import com.ryan.github.view.config.CacheConfig;
 import com.ryan.github.view.config.FastCacheMode;
-import com.ryan.github.view.cookie.CookieInterceptor;
-import com.ryan.github.view.cookie.CookieConfigManager;
-import com.ryan.github.view.cookie.CookieStrategy;
+import com.ryan.github.view.cookie.FastCookieManager;
 import com.ryan.github.view.offline.ResourceInterceptor;
 
 /**
@@ -22,7 +20,6 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     private InnerFastClient mFastClient;
     private WebViewClient mUserWebViewClient;
-    private CookieConfigManager mCookieManager;
 
     public FastWebView(Context context) {
         this(context, null);
@@ -34,7 +31,6 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     public FastWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mCookieManager = CookieConfigManager.getInstance();
     }
 
     @Override
@@ -60,7 +56,7 @@ public class FastWebView extends WebView implements FastOpenApi {
         if (mFastClient != null) {
             mFastClient.destroy();
         }
-        mCookieManager.clear();
+        getFastCookieManager().destroy();
         super.destroy();
     }
 
@@ -126,15 +122,7 @@ public class FastWebView extends WebView implements FastOpenApi {
         return mUserWebViewClient != null ? mUserWebViewClient : super.getWebViewClient();
     }
 
-    public void setCookieStrategy(CookieStrategy strategy) {
-        mCookieManager.setCookieStrategy(strategy);
-    }
-
-    public void setRequestCookieInterceptor(CookieInterceptor interceptor) {
-        mCookieManager.setRequestCookieInterceptor(interceptor);
-    }
-
-    public void setResponseCookieInterceptor(CookieInterceptor interceptor) {
-        mCookieManager.setResponseCookieInterceptor(interceptor);
+    public FastCookieManager getFastCookieManager() {
+        return FastCookieManager.getInstance();
     }
 }

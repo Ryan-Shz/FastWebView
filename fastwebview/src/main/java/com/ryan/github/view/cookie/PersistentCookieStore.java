@@ -34,7 +34,7 @@ public class PersistentCookieStore implements CookieStore {
     private final SharedPreferences mCookiePrefs;
     private boolean mOmitNonPersistentCookies = false;
 
-    public PersistentCookieStore(Context context) {
+    PersistentCookieStore(Context context) {
         mCookiePrefs = context.getSharedPreferences(COOKIE_PREFS, Context.MODE_PRIVATE);
         mCookies = new ConcurrentHashMap<>();
         // load persistent cookie from disk.

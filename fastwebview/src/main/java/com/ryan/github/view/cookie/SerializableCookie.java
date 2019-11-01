@@ -17,7 +17,7 @@ public class SerializableCookie implements Serializable {
     private transient final Cookie cookie;
     private transient Cookie clientCookie;
 
-    public SerializableCookie(Cookie cookie) {
+    SerializableCookie(Cookie cookie) {
         this.cookie = cookie;
     }
 
@@ -56,7 +56,6 @@ public class SerializableCookie implements Serializable {
         boolean secure = in.readBoolean();
         boolean httpOnly = in.readBoolean();
         boolean hostOnly = in.readBoolean();
-        boolean persistent = in.readBoolean();
 
         Cookie.Builder builder = new Cookie.Builder()
                 .name(name)

@@ -16,11 +16,10 @@ import okhttp3.HttpUrl;
 public class MemoryCookieStore implements CookieStore {
 
     private static final String HOST_NAME_PREFIX = "host_";
-    private static final String COOKIE_NAME_PREFIX = "cookie_";
 
     private final HashMap<String, ConcurrentHashMap<String, Cookie>> cookies;
 
-    public MemoryCookieStore() {
+    MemoryCookieStore() {
         this.cookies = new HashMap<>();
     }
 
