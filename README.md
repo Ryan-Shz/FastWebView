@@ -10,6 +10,7 @@ Android原生WebView有磁盘缓存最大上限，在4.4之前只有10M，在4.4
 3. 提供资源拦截器支持自定义读取静态资源（比如读取assets/sdcard中的资源替换在线资源）
 4. 支持离线加载/预加载
 5. cookie自动缓存和发布
+6. 提供WebView缓存池
 
 ## 使用方法
 将原生的WebView替换为FastWebView，并选择相应的缓存模式。
