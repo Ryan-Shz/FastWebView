@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -45,8 +46,18 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     @Override
     public void destroy() {
+        release();
+        super.destroy();
+    }
+
+    public void release(){
         stopLoading();
-        getSettings().setJavaScriptEnabled(false);
+        setWebViewClient(null);
+        setWebChromeClient(null);
+        WebSettings settings = getSettings();
+        settings.setJavaScriptEnabled(false);
+        settings.setBlockNetworkImage(false);
+        clearCache(false);
         clearHistory();
         removeAllViews();
         ViewParent viewParent = this.getParent();
@@ -57,7 +68,6 @@ public class FastWebView extends WebView implements FastOpenApi {
             mFastClient.destroy();
         }
         getFastCookieManager().destroy();
-        super.destroy();
     }
 
     public static void preload(Context context, String url) {
