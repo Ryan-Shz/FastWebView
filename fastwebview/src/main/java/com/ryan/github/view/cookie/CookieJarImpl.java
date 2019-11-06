@@ -2,6 +2,7 @@ package com.ryan.github.view.cookie;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.webkit.CookieManager;
 
 import java.util.List;
 
@@ -39,10 +40,15 @@ public class CookieJarImpl implements CookieJar {
     @Override
     public synchronized List<Cookie> loadForRequest(HttpUrl url) {
         List<Cookie> cookies = mCookieStore.get(url);
-        String cookieStr = android.webkit.CookieManager.getInstance().getCookie(url.host());
-        if (!TextUtils.isEmpty(cookieStr)) {
-            Cookie cookie = Cookie.parse(url, cookieStr);
-            cookies.add(cookie);
+        String cookieFullStr = CookieManager.getInstance().getCookie(url.host());
+        if (!TextUtils.isEmpty(cookieFullStr)) {
+            String[] cookieArr = cookieFullStr.split(";");
+            for (String cookieStr : cookieArr) {
+                Cookie cookie = Cookie.parse(url, cookieStr);
+                if (cookie != null) {
+                    cookies.add(cookie);
+                }
+            }
         }
         CookieInterceptor interceptor = mCookieManager.getResponseCookieInterceptor();
         if (interceptor != null) {

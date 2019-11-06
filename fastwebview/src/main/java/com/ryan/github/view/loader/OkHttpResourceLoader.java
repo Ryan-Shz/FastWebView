@@ -12,6 +12,7 @@ import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,13 +55,23 @@ public class OkHttpResourceLoader implements ResourceLoader {
         if (TextUtils.isEmpty(userAgent)) {
             userAgent = DEFAULT_USER_AGENT;
         }
+        Locale locale = Locale.getDefault();
+        String acceptLanguage;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            acceptLanguage = locale.toLanguageTag();
+        } else {
+            acceptLanguage = locale.getLanguage();
+        }
+        if (!acceptLanguage.equalsIgnoreCase("en-US")) {
+            acceptLanguage += ",en-US;q=0.9";
+        }
         Request.Builder requestBuilder = new Request.Builder()
                 .removeHeader(HEADER_USER_AGENT)
                 .addHeader(HEADER_USER_AGENT, userAgent)
                 .addHeader("Upgrade-Insecure-Requests", "1")
-                .addHeader("Accept-Language", "en-US,en;q=0.9")
                 .addHeader("X-Requested-With", mContext.getPackageName())
-                .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+                .addHeader("Accept", "*/*")
+                .addHeader("Accept-Language", acceptLanguage);
         Map<String, String> headers = sourceRequest.getHeaders();
         if (headers != null && !headers.isEmpty()) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
