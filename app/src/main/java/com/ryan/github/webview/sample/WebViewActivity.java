@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -26,6 +27,7 @@ import com.ryan.github.view.cookie.CookieStrategy;
 import com.ryan.github.view.cookie.FastCookieManager;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
+import com.ryan.github.view.utils.LogUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,18 +47,22 @@ public class WebViewActivity extends AppCompatActivity {
     private static final String TAG = "FastWebView";
     private FastWebView fastWebView;
     private long initStartTime;
+    private long startTime;
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogUtils.d("------------- start once load -------------");
+        startTime = SystemClock.uptimeMillis();
         initStartTime = SystemClock.uptimeMillis();
         if (sUseWebViewPool) {
             fastWebView = FastWebViewPool.acquire(this);
         } else {
-            Log.d(FastWebViewPool.TAG, "create new webview instance.");
+            LogUtils.d("create new webview instance.");
             fastWebView = new FastWebView(this);
         }
+        fastWebView.setWebChromeClient(new MonitorWebChromeClient());
         fastWebView.setWebViewClient(new MonitorWebViewClient());
         setContentView(fastWebView);
         fastWebView.setFocusable(true);
@@ -138,7 +144,6 @@ public class WebViewActivity extends AppCompatActivity {
         Log.v(TAG, "dom build time: " + (performance.getDomComplete() - performance.getDomInteractive()) + "ms.");
         Log.v(TAG, "dom ready time: " + (performance.getDomContentLoadedEventEnd() - performance.getNavigationStart()) + "ms.");
         Log.v(TAG, "load time: " + (performance.getLoadEventEnd() - performance.getNavigationStart()) + "ms.");
-        Log.v(TAG, "===================");
     }
 
     @Override
@@ -167,7 +172,7 @@ public class WebViewActivity extends AppCompatActivity {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             if (first) {
-                Log.d(FastWebViewPool.TAG, "cost: " + (SystemClock.uptimeMillis() - initStartTime));
+                LogUtils.d("init cost time: " + (SystemClock.uptimeMillis() - initStartTime));
                 first = false;
             }
             return super.shouldInterceptRequest(view, request);
@@ -183,5 +188,14 @@ public class WebViewActivity extends AppCompatActivity {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public class MonitorWebChromeClient extends WebChromeClient {
+
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+            Log.d(TAG, "white screen time: " + (SystemClock.uptimeMillis() - startTime));
+        }
     }
 }

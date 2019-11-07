@@ -3,8 +3,8 @@ package com.ryan.github.view;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.support.v4.util.Pools;
-import android.util.Log;
 
+import com.ryan.github.view.utils.LogUtils;
 import com.ryan.github.view.webview.BuildConfig;
 
 /**
@@ -17,7 +17,6 @@ import com.ryan.github.view.webview.BuildConfig;
  */
 public class FastWebViewPool {
 
-    public static final String TAG = "FastWebViewPool";
     private static final int MAX_POOL_SIZE = 2;
     private static final Pools.Pool<FastWebView> sPool = new Pools.SynchronizedPool<>(MAX_POOL_SIZE);
 
@@ -31,13 +30,13 @@ public class FastWebViewPool {
             MutableContextWrapper wrapper = new MutableContextWrapper(context);
             webView = new FastWebView(wrapper);
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "create new webview instance.");
+                LogUtils.d("create new webview instance.");
             }
         } else {
             MutableContextWrapper wrapper = (MutableContextWrapper) webView.getContext();
             wrapper.setBaseContext(context);
             if (BuildConfig.DEBUG) {
-                Log.d(TAG, "obtain webview instance from pool.");
+                LogUtils.d("obtain webview instance from pool.");
             }
         }
         return webView;
@@ -52,7 +51,7 @@ public class FastWebViewPool {
         wrapper.setBaseContext(wrapper.getApplicationContext());
         sPool.release(webView);
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "release webview instance to pool.");
+            LogUtils.d("release webview instance to pool.");
         }
     }
 }
