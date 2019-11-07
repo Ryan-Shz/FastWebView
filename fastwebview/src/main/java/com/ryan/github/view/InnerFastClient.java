@@ -34,8 +34,10 @@ class InnerFastClient extends WebViewClient implements FastOpenApi, Destroyable 
     private WebViewCache mWebViewCache;
     private final int mWebViewCacheMode;
     private final String mUserAgent;
+    private FastWebView mOwner;
 
-    InnerFastClient(WebView owner) {
+    InnerFastClient(FastWebView owner) {
+        mOwner = owner;
         WebSettings settings = owner.getSettings();
         mWebViewCacheMode = settings.getCacheMode();
         mUserAgent = settings.getUserAgentString();
@@ -185,6 +187,10 @@ class InnerFastClient extends WebViewClient implements FastOpenApi, Destroyable 
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        if (mOwner.isRecycled() && !url.equals("about:blank")) {
+            mOwner.setRecycled(false);
+            mOwner.clearHistory();
+        }
         if (mDelegate != null) {
             mDelegate.onPageFinished(view, url);
             return;

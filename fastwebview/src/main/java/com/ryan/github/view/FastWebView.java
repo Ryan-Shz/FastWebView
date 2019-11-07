@@ -21,6 +21,7 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     private InnerFastClient mFastClient;
     private WebViewClient mUserWebViewClient;
+    private boolean mRecycled = false;
 
     public FastWebView(Context context) {
         this(context, null);
@@ -50,15 +51,17 @@ public class FastWebView extends WebView implements FastOpenApi {
         super.destroy();
     }
 
-    public void release(){
+    public void release() {
         stopLoading();
+        loadUrl("");
+        setRecycled(true);
         setWebViewClient(null);
         setWebChromeClient(null);
         WebSettings settings = getSettings();
         settings.setJavaScriptEnabled(false);
         settings.setBlockNetworkImage(false);
-        clearCache(false);
         clearHistory();
+        clearCache(true);
         removeAllViews();
         ViewParent viewParent = this.getParent();
         if (viewParent != null && viewParent instanceof ViewGroup) {
@@ -134,5 +137,18 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     public FastCookieManager getFastCookieManager() {
         return FastCookieManager.getInstance();
+    }
+
+    @Override
+    public boolean canGoBack() {
+        return !mRecycled && super.canGoBack();
+    }
+
+    boolean isRecycled() {
+        return mRecycled;
+    }
+
+    void setRecycled(boolean recycled) {
+        this.mRecycled = recycled;
     }
 }
