@@ -1,4 +1,7 @@
 # FastWebView
+
+[ ![Download](https://api.bintray.com/packages/ryan-shz/Ryan/fastwebview/images/download.svg) ](https://bintray.com/ryan-shz/Ryan/fastwebview/_latestVersion)![](https://img.shields.io/badge/license-MIT-green)
+
 ## 背景
 Android原生WebView有磁盘缓存最大上限，在4.4之前只有10M，在4.4及其之后虽然提升至20M，但对频繁的H5业务场景来说，还是太小了。我们有很多业务界面使用H5实现，在使用正常HTTP缓存协议对资源缓存时，
 太小的缓存空间很容易导致页面缓存被清除，从而重新加载。不仅浪费用户的流量，加载速度慢也会造成不好的用户体验。如果服务器或者客户端的开发同学对缓存协议不熟悉，就很容易导致无法高效的利用缓存。
@@ -16,25 +19,51 @@ FastWebView通过自定义本地缓存的方式，
 5. cookie自动缓存和发布
 6. 提供WebView缓存池
 
-## 使用方法
-将原生的WebView替换为FastWebView，并选择相应的缓存模式。
+## Quick Start
+
+### 导入
+
+```
+implementation "com.ryan.github:fastwebview:1.0.0"
+```
+
+### 使用
+
+将原生的WebView替换为FastWebView，并选择相应的缓存模式即可。
+
+示例代码如下：
+
+```
+FastWebView fastWebView = new FastWebView(this);
+// 使用强制缓存模式
+fastWebView.setCacheMode(FastCacheMode.FORCE);
+```
+
+到这里FastWebView已经成功接入，就可以正常使用了。
+
+## 高级用法
+
+### 1. 缓存模式说明
 
 Fast提供了以下3种缓存模式：
 
-1. FastCacheMode.DEFAULT  // 默认缓存模式
-2. FastCacheMode.NORMAL // 正常缓存模式
-3. FastCacheMode.FORCE // 强制缓存模式
+| 缓存模式              | 描述                                                         |
+| --------------------- | ------------------------------------------------------------ |
+| FastCacheMode.DEFAULT | 默认缓存模式                                                 |
+| FastCacheMode.NORMAL  | 正常缓存模式，使用OkHttp加载资源，缓存上限提升为100MB        |
+| FastCacheMode.FORCE   | 强制缓存模式，使用OkHttp加载资源，强制缓存不被过滤器过滤的资源 |
 
-### 默认缓存模式
+#### 1.1. 默认缓存模式
 
 使用默认缓存模式时，FastWebView和原生webview无任何差异, 不会有任何的代码侵入。
 
 ```
 FastWebView fastWebView = new FastWebView(this);
+// 下面这行可以不调用，效果是一样的
 fastWebView.setCacheMode(FastCacheMode.DEFAULT);
 ```
 
-### 正常缓存模式
+#### 1.2. 正常缓存模式
 
 使用正常缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，磁盘缓存上限提升为100MB。
 
@@ -43,7 +72,7 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.setCacheMode(FastCacheMode.NORMAL);
 ```
 
-### 强制缓存模式
+#### 1.3. 强制缓存模式
 
 使用强制缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，并且FastWebView会无视HTTP缓存协议，强制缓存所加载H5中所有不被过滤器过滤的静态资源。
 
@@ -81,7 +110,7 @@ public DefaultMimeTypeFilter() {
 }
 ```
 
-#### 强制缓存模式的配置选项
+##### 强制缓存模式的配置选项
 
 ```
 fastWebView.setCacheConfig(new CacheConfig.Builder()
@@ -97,13 +126,13 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 3. setVersion(int version) 设置缓存版本，默认为1
 4. setDiskCacheSize(long diskCacheSize) 设置磁盘缓存上限大小
 
-#### 强制缓存模式下如何更新静态资源？
+##### 强制缓存模式下如何更新静态资源？
 
 由于FastWebView的强制缓存模式会强制缓存静态资源文件到本地，并且优先使用本地资源。
 
 所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，FastWebView会重新从网络下载。
 
-### 资源加载拦截器
+#### 资源加载拦截器
 
 > 注意：ResourceInterceptor只对NORMAL和FORCE两种缓存模式生效。
 
@@ -127,8 +156,10 @@ fastWebView.addResourceInterceptor(new ResourceInterceptor() {
     }
 });
 ```
-### Cookie选项
-#### Cookie缓存模式
+#### 3. Cookie选项
+
+##### 3.1. Cookie缓存模式
+
 FastWebView实现了Cookie的自动缓存，并提供了以下两种缓存模式：
 ```
 CookieStrategy.MEMORY; // 内存缓存模式
@@ -141,20 +172,22 @@ FastCookieManager cookieManager = fastView.getFastCookieManager();
 cookieManager.setCookieStrategy(CookieStrategy strategy);
 ```
 
-#### Cookie拦截器
+##### 3.2. Cookie拦截器
+
 Cookie拦截器用来拦截请求和响应获取到的Cookie列表，从而实现添加自定义Cookie的功能：
 ```
 FastCookieManager cookieManager = fastView.getFastCookieManager();
 cookieManager.addRequestCookieInterceptor(CookieInterceptor interceptor);
 cookieManager.addResponseCookieInterceptor(CookieInterceptor interceptor);
 ```
-### 执行JS脚本
+#### 4. 执行JS脚本
 
 ```
 fastWebView.runJs(String function, Object... args);
 ```
 
-### 预加载
+#### 5. 预加载
+
 由于首次加载资源时，需要完整加载整个H5页面，加载速度跟原生webview无异。但我们可以使用preload来预加载页面。
 ```
 FastWebView.preload(Context context, String url)
