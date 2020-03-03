@@ -65,6 +65,12 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                 long headerSize = entrySource.readDecimalLong();
                 Map<String, String> headers;
                 Headers.Builder responseHeadersBuilder = new Headers.Builder();
+                // read first placeholder line
+                String placeHolder = entrySource.readUtf8LineStrict();
+                if (!TextUtils.isEmpty(placeHolder.trim())) {
+                    responseHeadersBuilder.add(placeHolder);
+                    headerSize--;
+                }
                 for (int i = 0; i < headerSize; i++) {
                     String line = entrySource.readUtf8LineStrict();
                     if (!TextUtils.isEmpty(line)) {
@@ -96,7 +102,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         CacheRequest request = chain.getRequest();
         ensureDiskLruCacheCreate();
         WebResource webResource = getFromDiskCache(request.getKey());
-        if (webResource != null) {
+        if (webResource != null && isRealMimeTypeCacheable(webResource)) {
             LogUtils.d(String.format("disk cache hit: %s", request.getUrl()));
             return webResource;
         }
@@ -182,18 +188,17 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         Map<String, String> headers = resource.getResponseHeaders();
         String contentType = null;
         if (headers != null) {
-            String contentTypeKey = "Content-Type";
-            if (headers.containsKey(contentTypeKey)) {
-                String contentTypeValue = headers.get(contentTypeKey);
-                if (!TextUtils.isEmpty(contentTypeValue)) {
-                    String[] contentTypeArray = contentTypeValue.split(";");
-                    if (contentTypeArray.length >= 1) {
-                        contentType = contentTypeArray[0];
-                    }
+            String uppercaseKey = "Content-Type";
+            String lowercaseKey = uppercaseKey.toLowerCase();
+            String contentTypeValue = headers.containsKey(uppercaseKey) ? headers.get(uppercaseKey) : headers.get(lowercaseKey);
+            if (!TextUtils.isEmpty(contentTypeValue)) {
+                String[] contentTypeArray = contentTypeValue.split(";");
+                if (contentTypeArray.length >= 1) {
+                    contentType = contentTypeArray[0];
                 }
             }
         }
-        return !mCacheConfig.getFilter().isFilter(contentType);
+        return contentType != null && !mCacheConfig.getFilter().isFilter(contentType);
     }
 }
 
