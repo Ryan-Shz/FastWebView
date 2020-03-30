@@ -1,8 +1,5 @@
 package com.ryan.github.view;
 
-import com.ryan.github.view.utils.ReusableInputStream;
-
-import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 /**
@@ -14,8 +11,6 @@ public class WebResource {
     private int responseCode;
 
     private String reasonPhrase;
-
-    private ReusableInputStream inputStream;
 
     private Map<String, String> responseHeaders;
 
@@ -31,14 +26,6 @@ public class WebResource {
 
     public boolean isModified() {
         return isModified;
-    }
-
-    public ReusableInputStream getInputStream() {
-        return inputStream;
-    }
-
-    public void setInputStream(ReusableInputStream inputStream) {
-        this.inputStream = inputStream;
     }
 
     public Map<String, String> getResponseHeaders() {
@@ -59,14 +46,6 @@ public class WebResource {
 
     public void setOriginBytes(byte[] bytes) {
         this.originBytes = bytes;
-    }
-
-    public boolean newResource() {
-        if (originBytes != null) {
-            this.inputStream = new ReusableInputStream(new ByteArrayInputStream(originBytes));
-            return true;
-        }
-        return false;
     }
 
     public byte[] getOriginBytes() {

@@ -3,8 +3,8 @@ package com.ryan.github.view.loader;
 import android.util.Log;
 
 import com.ryan.github.view.WebResource;
-import com.ryan.github.view.utils.ReusableInputStream;
 import com.ryan.github.view.utils.HeaderUtils;
+import com.ryan.github.view.utils.StreamUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -37,8 +37,7 @@ public class DefaultResourceLoader implements ResourceLoader {
             int responseCode = httpURLConnection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 WebResource remoteResource = new WebResource();
-                ReusableInputStream inputStream = new ReusableInputStream(httpURLConnection.getInputStream());
-                remoteResource.setInputStream(inputStream);
+                remoteResource.setOriginBytes(StreamUtils.streamToBytes(httpURLConnection.getInputStream()));
                 remoteResource.setResponseCode(responseCode);
                 remoteResource.setReasonPhrase(httpURLConnection.getResponseMessage());
                 remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(httpURLConnection.getHeaderFields()));

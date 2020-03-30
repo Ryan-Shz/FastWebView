@@ -7,7 +7,6 @@ import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
 import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
-import com.ryan.github.view.utils.ReusableInputStream;
 import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
@@ -91,12 +90,10 @@ public class OkHttpResourceLoader implements ResourceLoader {
             if (response.code() == HTTP_OK || response.code() == HTTP_NOT_MODIFIED) {
                 ResponseBody responseBody = response.body();
                 if (responseBody != null) {
-                    InputStream is = responseBody.byteStream();
                     remoteResource.setResponseCode(response.code());
                     remoteResource.setReasonPhrase(response.message());
                     remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
-                    ReusableInputStream inputStream = new ReusableInputStream(is);
-                    remoteResource.setInputStream(inputStream);
+                    remoteResource.setOriginBytes(responseBody.bytes());
                     remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
                     remoteResource.setCache(!isCacheByOkHttp);
                     return remoteResource;

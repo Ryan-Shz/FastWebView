@@ -4,10 +4,10 @@ import android.text.TextUtils;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.utils.StreamUtils;
 import com.ryan.github.view.utils.lru.DiskLruCache;
 import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
-import com.ryan.github.view.utils.ReusableInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                     WebResource webResource = new WebResource();
                     webResource.setReasonPhrase(reasonPhrase);
                     webResource.setResponseCode(Integer.valueOf(responseCode));
-                    webResource.setInputStream(new ReusableInputStream(inputStream));
+                    webResource.setOriginBytes(StreamUtils.streamToBytes(inputStream));
                     webResource.setResponseHeaders(headers);
                     webResource.setModified(false);
                     return webResource;
@@ -125,7 +125,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
     }
 
     private void cacheToDisk(String key, WebResource webResource) {
-        if (webResource == null || webResource.getInputStream() == null) {
+        if (webResource == null) {
             return;
         }
         if (mDiskLruCache.isClosed()) {
@@ -157,20 +157,10 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             byte[] originBytes = webResource.getOriginBytes();
             if (originBytes != null && originBytes.length > 0) {
                 sink.write(originBytes);
-            } else {
-                InputStream inputStream = webResource.getInputStream();
-                inputStream.reset();
-                BufferedSource source = Okio.buffer(Okio.source(inputStream));
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = source.read(buffer)) != -1) {
-                    sink.write(buffer, 0, len);
-                }
-                inputStream.reset();
+                sink.flush();
+                sink.close();
+                editor.commit();
             }
-            sink.flush();
-            sink.close();
-            editor.commit();
         } catch (IOException e) {
             LogUtils.d("cache to disk failed. cause by: " + e.getMessage());
             try {

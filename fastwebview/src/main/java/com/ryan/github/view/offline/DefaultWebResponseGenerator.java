@@ -6,6 +6,8 @@ import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -50,14 +52,19 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         if (TextUtils.isEmpty(charset)) {
             charset = "UTF-8";
         }
+        byte[] resourceBytes = resource.getOriginBytes();
+        if (resourceBytes == null || resourceBytes.length <= 0) {
+            return null;
+        }
+        InputStream bis = new ByteArrayInputStream(resourceBytes);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int status = resource.getResponseCode();
             String reasonPhrase = resource.getReasonPhrase();
             if (TextUtils.isEmpty(reasonPhrase) && status == 200) {
                 reasonPhrase = "OK";
             }
-            return new WebResourceResponse(urlMime, charset, status, reasonPhrase, resource.getResponseHeaders(), resource.getInputStream());
+            return new WebResourceResponse(urlMime, charset, status, reasonPhrase, resource.getResponseHeaders(), bis);
         }
-        return new WebResourceResponse(urlMime, charset, resource.getInputStream());
+        return new WebResourceResponse(urlMime, charset, bis);
     }
 }
