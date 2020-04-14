@@ -12,6 +12,7 @@ import com.ryan.github.view.offline.OfflineServer;
 import com.ryan.github.view.offline.OfflineServerImpl;
 import com.ryan.github.view.offline.ResourceInterceptor;
 import com.ryan.github.view.utils.AppVersionUtil;
+import com.ryan.github.view.utils.MemorySizeCalculator;
 import com.ryan.github.view.utils.MimeTypeMapUtils;
 
 import java.io.File;
@@ -84,6 +85,7 @@ public class WebViewCacheImpl implements WebViewCache {
                 .setExtensionFilter(new DefaultMimeTypeFilter())
                 .setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE)
                 .setVersion(AppVersionUtil.getVersionCode(mContext))
+                .setMemoryCacheSize(MemorySizeCalculator.getSize())
                 .setCacheDir(dir)
                 .build();
     }

@@ -9,6 +9,7 @@ public class CacheConfig {
     private String mCacheDir;
     private int mVersion;
     private long mDiskCacheSize;
+    private int mMemCacheSize;
     private MimeTypeFilter mFilter;
 
     private CacheConfig() {
@@ -35,11 +36,16 @@ public class CacheConfig {
         return mDiskCacheSize;
     }
 
+    public int getMemCacheSize() {
+        return mMemCacheSize;
+    }
+
     public static class Builder {
 
         private String cacheDir;
         private int version;
         private long diskCacheSize;
+        private int memoryCacheSize;
         private MimeTypeFilter filter;
 
         public Builder setCacheDir(String cacheDir) {
@@ -62,12 +68,18 @@ public class CacheConfig {
             return this;
         }
 
+        public Builder setMemoryCacheSize(int memoryCacheSize) {
+            this.memoryCacheSize = memoryCacheSize;
+            return this;
+        }
+
         public CacheConfig build() {
             CacheConfig config = new CacheConfig();
             config.mCacheDir = cacheDir;
             config.mVersion = version;
             config.mDiskCacheSize = diskCacheSize;
             config.mFilter = filter;
+            config.mMemCacheSize = memoryCacheSize;
             return config;
         }
     }

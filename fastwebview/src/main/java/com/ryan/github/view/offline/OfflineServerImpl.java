@@ -35,6 +35,7 @@ public class OfflineServerImpl implements OfflineServer {
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
                 interceptors.addAll(mBaseInterceptorList);
             }
+            interceptors.add(MemResourceInterceptor.getInstance(cacheConfig));
             interceptors.add(new DiskResourceInterceptor(cacheConfig));
             interceptors.add(new ForceRemoteResourceInterceptor(context, cacheConfig));
             mForceModeChainList = interceptors;
