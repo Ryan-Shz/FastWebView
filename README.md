@@ -115,6 +115,7 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
         .setCacheDir(String fileDir)
         .setExtensionFilter(ExtensionFilter filter)
         .setVersion(int version)
+        .setMemorySize(int size)
         .setDiskCacheSize(long diskCacheSize)
         .build());
 ```
@@ -122,7 +123,8 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 1. setCacheDir(String fileDir) 设置强制缓存目录
 2. setExtensionFilter(ExtensionFilter filter) 设置资源类型过滤器
 3. setVersion(int version) 设置缓存版本，默认为1
-4. setDiskCacheSize(long diskCacheSize) 设置磁盘缓存上限大小
+4. setDiskCacheSize(long diskCacheSize) 设置磁盘缓存上限
+5. setMemorySize(int size) 设置内存缓存上限
 
 ##### 强制缓存模式下如何更新静态资源？
 
