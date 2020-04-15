@@ -5,6 +5,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
@@ -30,6 +31,9 @@ import com.ryan.github.view.offline.ResourceInterceptor;
  */
 class InnerFastClient extends WebViewClient implements FastOpenApi, Destroyable {
 
+    private static final String SCHEME_HTTP = "http";
+    private static final String SCHEME_HTTPS = "https";
+    private static final String METHOD_GET = "GET";
     private WebViewClient mDelegate;
     private WebViewCache mWebViewCache;
     private final int mWebViewCacheMode;
@@ -264,9 +268,9 @@ class InnerFastClient extends WebViewClient implements FastOpenApi, Destroyable 
     private WebResourceResponse loadFromWebViewCache(WebResourceRequest request) {
         String scheme = request.getUrl().getScheme().trim();
         String method = request.getMethod().trim();
-        if ((scheme.equalsIgnoreCase("http")
-                || scheme.equalsIgnoreCase("https"))
-                && method.equalsIgnoreCase("GET")) {
+        if ((TextUtils.equals(SCHEME_HTTP, scheme)
+                || TextUtils.equals(SCHEME_HTTPS, scheme))
+                && method.equalsIgnoreCase(METHOD_GET)) {
             return mWebViewCache.getResource(request, mWebViewCacheMode, mUserAgent);
         }
         return null;
