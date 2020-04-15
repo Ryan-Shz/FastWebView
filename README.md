@@ -79,33 +79,42 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.setCacheMode(FastCacheMode.FORCE, cacheConfig);
 ```
 
-默认的过滤器会过滤所有音视频和**html**等资源类型：（即以下类型的资源不会被缓存，但支持HTTP缓存协议）
+默认的过滤器会过滤**除了JS/CSS/图片/文本文件外**的其他所有静态资源类型，包括**html**。
+
+即只有以下类型的资源会被强制缓存，其他资源类型不会被强制缓存，**但仍支持HTTP缓存协议**）
 
 ```
-public DefaultMimeTypeFilter() {
-    addMimeType("text/html");
-    // audio
-    addMimeType("audio/mpeg");
-    addMimeType("audio/midi");
-    addMimeType("audio/webm");
-    addMimeType("audio/ogg");
-    addMimeType("audio/wave");
-    addMimeType("audio/wav");
-    addMimeType("audio/x-wav");
-    addMimeType("audio/mp4");
-    addMimeType("audio/x-pn-wav");
-    addMimeType("audio/x-ms-wma");
-    // video
-    addMimeType("video/webm");
-    addMimeType("video/ogg");
-    addMimeType("video/x-msvideo");
-    addMimeType("video/mp4");
-    addMimeType("video/mpeg");
-    addMimeType("video/quicktime");
-    addMimeType("video/x-ms-wmv");
-    addMimeType("video/x-flv");
-    addMimeType("video/x-matroska");
-}
+// JavaScript
+addMimeType("application/javascript");
+addMimeType("application/ecmascript");
+addMimeType("application/x-ecmascript");
+addMimeType("application/x-javascript");
+addMimeType("text/ecmascript");
+addMimeType("text/javascript");
+addMimeType("text/javascript1.0");
+addMimeType("text/javascript1.1");
+addMimeType("text/javascript1.2");
+addMimeType("text/javascript1.3");
+addMimeType("text/javascript1.4");
+addMimeType("text/javascript1.5");
+addMimeType("text/jscript");
+addMimeType("text/livescript");
+addMimeType("text/x-ecmascript");
+addMimeType("text/x-javascript");
+// image
+addMimeType("image/gif");
+addMimeType("image/jpeg");
+addMimeType("image/png");
+addMimeType("image/svg+xml");
+addMimeType("image/bmp");
+addMimeType("image/webp");
+addMimeType("image/tiff");
+addMimeType("image/vnd.microsoft.icon");
+addMimeType("image/x-icon");
+// css
+addMimeType("text/css");
+// stream
+addMimeType("application/octet-stream");
 ```
 
 ##### 强制缓存模式的配置选项
