@@ -79,10 +79,7 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.setCacheMode(FastCacheMode.FORCE, cacheConfig);
 ```
 
-默认的过滤器会过滤**除了JS/CSS/图片/文本文件外**的其他所有静态资源类型，包括**html**。
-
-即只有以下类型的资源会被强制缓存，其他资源类型不会被强制缓存，**但仍支持HTTP缓存协议**）
-
+默认的过滤器会过滤**除了JS/CSS/图片/文本文件外**的其他所有静态资源类型，包括**html**。下面列出了可被强制缓存的类型：
 ```
 // JavaScript
 addMimeType("application/javascript");
@@ -116,7 +113,7 @@ addMimeType("text/css");
 // stream
 addMimeType("application/octet-stream");
 ```
-
+> 注意：在此白名单外的资源类型将不会被强制缓存，**但仍支持HTTP缓存协议**。
 ##### 强制缓存模式的配置选项
 
 ```
