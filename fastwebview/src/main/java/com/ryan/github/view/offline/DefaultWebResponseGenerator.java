@@ -53,7 +53,7 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
             charset = "UTF-8";
         }
         byte[] resourceBytes = resource.getOriginBytes();
-        if (resourceBytes == null || resourceBytes.length <= 0) {
+        if (resourceBytes == null || resourceBytes.length < 0) {
             return null;
         }
         InputStream bis = new ByteArrayInputStream(resourceBytes);
