@@ -47,7 +47,7 @@ Fast提供了以下3种缓存模式：
 
 | 缓存模式              | 描述                                                         |
 | --------------------- | ------------------------------------------------------------ |
-| FastCacheMode.DEFAULT | 默认缓存模式                                                 |
+| FastCacheMode.DEFAULT | 默认缓存模式，和原生webview无任何差异，无任何侵入                                                 |
 | FastCacheMode.NORMAL  | 普通缓存模式，切换为OkHttp加载资源，磁盘缓存上限提升为100MB        |
 | FastCacheMode.FORCE   | 强制缓存模式，切换为OkHttp加载资源，强制缓存不被过滤器过滤的资源 |
 
