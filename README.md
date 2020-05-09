@@ -11,7 +11,7 @@ FastWebView通过自定义本地缓存的方式，突破原生WebView缓存限�
 
 ## 特性
 1. 自定义本地缓存，突破原生webview缓存限制
-2. 提供默认、正常和强制三种缓存模式
+2. 提供默认、普通和强制三种缓存模式
 3. 提供资源拦截器支持自定义读取静态资源（比如读取assets/sdcard中的资源替换在线资源）
 4. 支持离线加载/预加载
 5. cookie自动缓存和发布
@@ -48,8 +48,8 @@ Fast提供了以下3种缓存模式：
 | 缓存模式              | 描述                                                         |
 | --------------------- | ------------------------------------------------------------ |
 | FastCacheMode.DEFAULT | 默认缓存模式                                                 |
-| FastCacheMode.NORMAL  | 正常缓存模式，使用OkHttp加载资源，缓存上限提升为100MB        |
-| FastCacheMode.FORCE   | 强制缓存模式，使用OkHttp加载资源，强制缓存不被过滤器过滤的资源 |
+| FastCacheMode.NORMAL  | 普通缓存模式，切换为OkHttp加载资源，磁盘缓存上限提升为100MB        |
+| FastCacheMode.FORCE   | 强制缓存模式，切换为OkHttp加载资源，强制缓存不被过滤器过滤的资源 |
 
 #### 1.1. 默认缓存模式
 
@@ -61,9 +61,9 @@ FastWebView fastWebView = new FastWebView(this);
 fastWebView.setCacheMode(FastCacheMode.DEFAULT);
 ```
 
-#### 1.2. 正常缓存模式
+#### 1.2. 普通缓存模式
 
-使用正常缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，磁盘缓存上限提升为100MB。
+使用普通缓存模式时，默认的网络请求方式由HttpUrlConnection切换为OkHttp，磁盘缓存上限提升为100MB。
 
 ```
 FastWebView fastWebView = new FastWebView(this);
@@ -166,7 +166,7 @@ fastWebView.addResourceInterceptor(new ResourceInterceptor() {
 
 ##### 3.1. Cookie缓存模式
 
-FastWebView实现了Cookie的自动缓存，并提供了以下两种缓存模式：
+FastWebView实现了Cookie的自动缓存和上传，并提供了以下两种缓存模式：
 ```
 CookieStrategy.MEMORY; // 内存缓存模式
 CookieStrategy.PERSISTENT; // 持久缓存模式
