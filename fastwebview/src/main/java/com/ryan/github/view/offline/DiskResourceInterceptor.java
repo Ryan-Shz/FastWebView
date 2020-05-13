@@ -1,6 +1,7 @@
 package com.ryan.github.view.offline;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.config.CacheConfig;
@@ -133,6 +134,10 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         }
         try {
             DiskLruCache.Editor editor = mDiskLruCache.edit(key);
+            if (editor == null) {
+                LogUtils.e("Another edit is in progress!");
+                return;
+            }
             OutputStream metaOutput = editor.newOutputStream(ENTRY_META);
             BufferedSink sink = Okio.buffer(Okio.sink(metaOutput));
             // 1. write status
@@ -168,6 +173,8 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                 mDiskLruCache.remove(key);
             } catch (IOException ignore) {
             }
+        } catch (Exception e) {
+            LogUtils.e(e.getMessage());
         }
     }
 
