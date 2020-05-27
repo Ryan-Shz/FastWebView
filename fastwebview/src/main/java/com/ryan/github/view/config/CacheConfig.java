@@ -1,5 +1,12 @@
 package com.ryan.github.view.config;
 
+import android.content.Context;
+
+import com.ryan.github.view.utils.AppVersionUtil;
+import com.ryan.github.view.utils.MemorySizeCalculator;
+
+import java.io.File;
+
 /**
  * Created by Ryan
  * 2018/2/7 下午5:41
@@ -42,11 +49,18 @@ public class CacheConfig {
 
     public static class Builder {
 
+        private static final String CACHE_DIR_NAME = "cached_webview_force";
+        private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
         private String cacheDir;
         private int version;
-        private long diskCacheSize;
-        private int memoryCacheSize;
-        private MimeTypeFilter filter;
+        private long diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
+        private int memoryCacheSize = MemorySizeCalculator.getSize();
+        private MimeTypeFilter filter = new DefaultMimeTypeFilter();
+
+        public Builder(Context context) {
+            cacheDir = context.getCacheDir() + File.separator + CACHE_DIR_NAME;
+            version = AppVersionUtil.getVersionCode(context);
+        }
 
         public Builder setCacheDir(String cacheDir) {
             this.cacheDir = cacheDir;

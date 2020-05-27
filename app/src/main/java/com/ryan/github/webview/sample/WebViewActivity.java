@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.FastWebViewPool;
 import com.ryan.github.view.WebResource;
+import com.ryan.github.view.config.CacheConfig;
 import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.cookie.CookieInterceptor;
 import com.ryan.github.view.cookie.CookieStrategy;
@@ -29,6 +30,7 @@ import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
 import com.ryan.github.view.utils.LogUtils;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +95,10 @@ public class WebViewActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(fastWebView, true);
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        fastWebView.setCacheMode(FastCacheMode.FORCE);
+        CacheConfig config = new CacheConfig.Builder(this)
+                .setCacheDir(getCacheDir() + File.separator + "custom")
+                .build();
+        fastWebView.setCacheMode(FastCacheMode.FORCE, config);
         fastWebView.addResourceInterceptor(new ResourceInterceptor() {
             @Override
             public WebResource load(Chain chain) {

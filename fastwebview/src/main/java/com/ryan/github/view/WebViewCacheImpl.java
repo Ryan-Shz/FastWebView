@@ -5,14 +5,11 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.config.CacheConfig;
-import com.ryan.github.view.config.DefaultMimeTypeFilter;
 import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.offline.CacheRequest;
 import com.ryan.github.view.offline.OfflineServer;
 import com.ryan.github.view.offline.OfflineServerImpl;
 import com.ryan.github.view.offline.ResourceInterceptor;
-import com.ryan.github.view.utils.AppVersionUtil;
-import com.ryan.github.view.utils.MemorySizeCalculator;
 import com.ryan.github.view.utils.MimeTypeMapUtils;
 
 import java.io.File;
@@ -24,8 +21,6 @@ import java.util.Map;
  */
 public class WebViewCacheImpl implements WebViewCache {
 
-    private static final String CACHE_DIR_NAME = "cached_webview_force";
-    private static final int DEFAULT_DISK_CACHE_SIZE = 100 * 1024 * 1024;
     private FastCacheMode mFastCacheMode;
     private CacheConfig mCacheConfig;
     private OfflineServer mOfflineServer;
@@ -80,14 +75,7 @@ public class WebViewCacheImpl implements WebViewCache {
     }
 
     private CacheConfig generateDefaultCacheConfig() {
-        String dir = mContext.getCacheDir() + File.separator + CACHE_DIR_NAME;
-        return new CacheConfig.Builder()
-                .setExtensionFilter(new DefaultMimeTypeFilter())
-                .setDiskCacheSize(DEFAULT_DISK_CACHE_SIZE)
-                .setVersion(AppVersionUtil.getVersionCode(mContext))
-                .setMemoryCacheSize(MemorySizeCalculator.getSize())
-                .setCacheDir(dir)
-                .build();
+        return new CacheConfig.Builder(mContext).build();
     }
 
     @Override
