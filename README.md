@@ -17,7 +17,7 @@ FastWebView通过自定义本地缓存的方式，突破原生WebView缓存限�
 
 * 蓝线为使用FastWebView加载网页的平均时长
 
-![data](data.png)
+![实战数据](data.png)
 
 ## 特性
 1. 自定义本地缓存，突破原生webview缓存限制
