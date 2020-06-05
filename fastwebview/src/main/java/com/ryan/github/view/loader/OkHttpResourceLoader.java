@@ -87,18 +87,16 @@ public class OkHttpResourceLoader implements ResourceLoader {
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
-            if (response.code() == HTTP_OK || response.code() == HTTP_NOT_MODIFIED) {
-                ResponseBody responseBody = response.body();
-                if (responseBody != null) {
-                    remoteResource.setResponseCode(response.code());
-                    remoteResource.setReasonPhrase(response.message());
-                    remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
-                    remoteResource.setOriginBytes(responseBody.bytes());
-                    remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
-                    remoteResource.setCache(!isCacheByOkHttp);
-                    return remoteResource;
-                }
+            remoteResource.setResponseCode(response.code());
+            remoteResource.setReasonPhrase(response.message());
+            remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
+            ResponseBody responseBody = response.body();
+            if (responseBody != null) {
+                remoteResource.setOriginBytes(responseBody.bytes());
             }
+            remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
+            remoteResource.setCache(!isCacheByOkHttp);
+            return remoteResource;
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -33,6 +33,9 @@ public class OkHttpClientProvider {
                     .readTimeout(20, TimeUnit.SECONDS)
                     .writeTimeout(20, TimeUnit.SECONDS)
                     .connectTimeout(20, TimeUnit.SECONDS)
+                    // auto redirects is not allowed, bc we need to notify webview to do some internal processing.
+                    .followSslRedirects(false)
+                    .followRedirects(false)
                     .build();
         }
     }
