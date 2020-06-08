@@ -6,7 +6,7 @@ publish {
     repoName = 'Ryan'
     groupId = 'com.ryan.github'
     artifactId = 'fastwebview'
-    publishVersion = '1.0.4'
+    publishVersion = '1.0.5'
     desc = 'FastWebView通过自定义本地缓存策略和资源加载策略，突破了原生WebView缓存大小限制，提供多种缓存模式，支持预加载和离线加载，并友好的支持离线包方案，可以大幅提升H5加载速度。'
     website = 'https://github.com/Ryan-Shz/FastWebView'
 }
