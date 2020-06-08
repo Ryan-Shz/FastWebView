@@ -10,7 +10,6 @@ import com.ryan.github.view.utils.LogUtils;
 import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,6 @@ import static android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK;
 import static android.webkit.WebSettings.LOAD_CACHE_ONLY;
 import static android.webkit.WebSettings.LOAD_NO_CACHE;
 import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
-import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * load remote resources using okhttp.
@@ -74,8 +72,11 @@ public class OkHttpResourceLoader implements ResourceLoader {
         Map<String, String> headers = sourceRequest.getHeaders();
         if (headers != null && !headers.isEmpty()) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
-                requestBuilder.removeHeader(entry.getKey());
-                requestBuilder.addHeader(entry.getKey(), entry.getValue());
+                String header = entry.getKey();
+                if (!isNeedStripHeader(header)) {
+                    requestBuilder.removeHeader(header);
+                    requestBuilder.addHeader(header, entry.getValue());
+                }
             }
         }
         Request request = requestBuilder
@@ -124,5 +125,15 @@ public class OkHttpResourceLoader implements ResourceLoader {
 
     private CacheControl createNoStoreCacheControl() {
         return new CacheControl.Builder().noStore().build();
+    }
+
+    private boolean isNeedStripHeader(String headerName) {
+        return headerName.equalsIgnoreCase("If-Match")
+                || headerName.equalsIgnoreCase("If-None-Match")
+                || headerName.equalsIgnoreCase("If-Modified-Since")
+                || headerName.equalsIgnoreCase("If-Unmodified-Since")
+                || headerName.equalsIgnoreCase("Last-Modified")
+                || headerName.equalsIgnoreCase("Expires")
+                || headerName.equalsIgnoreCase("Cache-Control");
     }
 }
