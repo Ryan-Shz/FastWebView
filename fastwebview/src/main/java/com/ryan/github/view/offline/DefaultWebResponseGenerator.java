@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
+import com.ryan.github.view.utils.LogUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -54,6 +55,10 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         }
         byte[] resourceBytes = resource.getOriginBytes();
         if (resourceBytes == null || resourceBytes.length < 0) {
+            return null;
+        }
+        if (resourceBytes.length == 0 && resource.getResponseCode() == 304) {
+            LogUtils.e("the response bytes can not be empty if we get 304.");
             return null;
         }
         InputStream bis = new ByteArrayInputStream(resourceBytes);
