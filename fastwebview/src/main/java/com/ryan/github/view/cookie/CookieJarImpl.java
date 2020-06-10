@@ -29,7 +29,7 @@ public class CookieJarImpl implements CookieJar {
 
     @Override
     public synchronized void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-        CookieInterceptor interceptor = mCookieManager.getRequestCookieInterceptor();
+        CookieInterceptor interceptor = mCookieManager.getResponseCookieInterceptor();
         if (interceptor != null) {
             cookies = interceptor.newCookies(url, cookies);
         }
@@ -50,7 +50,7 @@ public class CookieJarImpl implements CookieJar {
                 }
             }
         }
-        CookieInterceptor interceptor = mCookieManager.getResponseCookieInterceptor();
+        CookieInterceptor interceptor = mCookieManager.getRequestCookieInterceptor();
         if (interceptor != null) {
             cookies = interceptor.newCookies(url, cookies);
         }
