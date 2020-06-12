@@ -33,7 +33,7 @@ FastWebView通过自定义本地缓存的方式，突破原生WebView缓存限�
 ### 导入
 
 ```
-implementation "com.ryan.github:fastwebview:1.0.7"
+implementation "com.ryan.github:fastwebview:1.0.8"
 ```
 
 ### 使用
