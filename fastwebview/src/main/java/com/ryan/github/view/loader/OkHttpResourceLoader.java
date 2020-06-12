@@ -2,6 +2,7 @@ package com.ryan.github.view.loader;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
@@ -96,7 +97,7 @@ public class OkHttpResourceLoader implements ResourceLoader {
                 remoteResource.setOriginBytes(responseBody.bytes());
             }
             remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
-            remoteResource.setCache(!isCacheByOkHttp);
+            remoteResource.setCacheByOurselves(!isCacheByOkHttp);
             return remoteResource;
         } catch (IOException e) {
             e.printStackTrace();

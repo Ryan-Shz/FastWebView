@@ -43,7 +43,7 @@ public class MemResourceInterceptor implements ResourceInterceptor, Destroyable 
             }
         }
         WebResource resource = chain.process(request);
-        if (mLruCache != null && checkResourceValid(resource)) {
+        if (mLruCache != null && checkResourceValid(resource) && resource.isCacheable()) {
             mLruCache.put(request.getKey(), resource);
         }
         return resource;
@@ -52,7 +52,7 @@ public class MemResourceInterceptor implements ResourceInterceptor, Destroyable 
     private boolean checkResourceValid(WebResource resource) {
         return resource != null
                 && resource.getOriginBytes() != null
-                && resource.getOriginBytes().length > 0
+                && resource.getOriginBytes().length >= 0
                 && resource.getResponseHeaders() != null
                 && !resource.getResponseHeaders().isEmpty();
     }
