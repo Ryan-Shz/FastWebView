@@ -65,8 +65,8 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int status = resource.getResponseCode();
             String reasonPhrase = resource.getReasonPhrase();
-            if (TextUtils.isEmpty(reasonPhrase) && status == 200) {
-                reasonPhrase = "OK";
+            if (TextUtils.isEmpty(reasonPhrase)) {
+                reasonPhrase = PhraseList.getPhrase(status);
             }
             return new WebResourceResponse(urlMime, charset, status, reasonPhrase, resource.getResponseHeaders(), bis);
         }
