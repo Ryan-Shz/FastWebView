@@ -2,7 +2,6 @@ package com.ryan.github.view.loader;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.webkit.WebResourceResponse;
 
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.okhttp.OkHttpClientProvider;
@@ -89,16 +88,18 @@ public class OkHttpResourceLoader implements ResourceLoader {
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
-            remoteResource.setResponseCode(response.code());
-            remoteResource.setReasonPhrase(response.message());
-            remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
-            ResponseBody responseBody = response.body();
-            if (responseBody != null) {
-                remoteResource.setOriginBytes(responseBody.bytes());
+            if (isInterceptorThisRequest(response)) {
+                remoteResource.setResponseCode(response.code());
+                remoteResource.setReasonPhrase(response.message());
+                remoteResource.setModified(response.code() != HTTP_NOT_MODIFIED);
+                ResponseBody responseBody = response.body();
+                if (responseBody != null) {
+                    remoteResource.setOriginBytes(responseBody.bytes());
+                }
+                remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
+                remoteResource.setCacheByOurselves(!isCacheByOkHttp);
+                return remoteResource;
             }
-            remoteResource.setResponseHeaders(HeaderUtils.generateHeadersMap(response.headers()));
-            remoteResource.setCacheByOurselves(!isCacheByOkHttp);
-            return remoteResource;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -136,5 +137,13 @@ public class OkHttpResourceLoader implements ResourceLoader {
                 || headerName.equalsIgnoreCase("Last-Modified")
                 || headerName.equalsIgnoreCase("Expires")
                 || headerName.equalsIgnoreCase("Cache-Control");
+    }
+
+    /**
+     * references {@link android.webkit.WebResourceResponse} setStatusCodeAndReasonPhrase
+     */
+    private boolean isInterceptorThisRequest(Response response) {
+        int code = response.code();
+        return !(code < 100 || code > 599 || (code > 299 && code < 400));
     }
 }
