@@ -27,7 +27,7 @@ public class WebViewCacheImpl implements WebViewCache {
     private Context mContext;
 
     WebViewCacheImpl(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     @Override
@@ -71,7 +71,10 @@ public class WebViewCacheImpl implements WebViewCache {
     }
 
     private CacheConfig getCacheConfig() {
-        return mCacheConfig != null ? mCacheConfig : generateDefaultCacheConfig();
+        if (mCacheConfig == null) {
+            mCacheConfig = generateDefaultCacheConfig();
+        }
+        return mCacheConfig;
     }
 
     private CacheConfig generateDefaultCacheConfig() {
@@ -86,6 +89,5 @@ public class WebViewCacheImpl implements WebViewCache {
         // help gc
         mCacheConfig = null;
         mOfflineServer = null;
-        mContext = null;
     }
 }
