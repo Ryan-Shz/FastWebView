@@ -17,6 +17,8 @@ import java.util.Map;
  */
 public class DefaultWebResponseGenerator implements WebResourceResponseGenerator {
 
+    private static final String KEY_CONTENT_TYPE = "Content-Type";
+
     @Override
     public WebResourceResponse generate(WebResource resource, String urlMime) {
         if (resource == null) {
@@ -26,20 +28,17 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         String contentType = null;
         String charset = null;
         if (headers != null) {
-            String contentTypeKey = "Content-Type";
-            if (headers.containsKey(contentTypeKey)) {
-                String contentTypeValue = headers.get(contentTypeKey);
-                if (!TextUtils.isEmpty(contentTypeValue)) {
-                    String[] contentTypeArray = contentTypeValue.split(";");
-                    if (contentTypeArray.length >= 1) {
-                        contentType = contentTypeArray[0];
-                    }
-                    if (contentTypeArray.length >= 2) {
-                        charset = contentTypeArray[1];
-                        String[] charsetArray = charset.split("=");
-                        if (charsetArray.length >= 2) {
-                            charset = charsetArray[1];
-                        }
+            String contentTypeValue = getContentType(headers, KEY_CONTENT_TYPE);
+            if (!TextUtils.isEmpty(contentTypeValue)) {
+                String[] contentTypeArray = contentTypeValue.split(";");
+                if (contentTypeArray.length >= 1) {
+                    contentType = contentTypeArray[0];
+                }
+                if (contentTypeArray.length >= 2) {
+                    charset = contentTypeArray[1];
+                    String[] charsetArray = charset.split("=");
+                    if (charsetArray.length >= 2) {
+                        charset = charsetArray[1];
                     }
                 }
             }
@@ -71,5 +70,13 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
             return new WebResourceResponse(urlMime, charset, status, reasonPhrase, resource.getResponseHeaders(), bis);
         }
         return new WebResourceResponse(urlMime, charset, bis);
+    }
+
+    private String getContentType(Map<String, String> headers, String key) {
+        if (headers != null) {
+            String value = headers.get(key);
+            return value != null ? value : headers.get(key.toLowerCase());
+        }
+        return null;
     }
 }
