@@ -22,6 +22,7 @@ import com.ryan.github.view.FastWebView;
 import com.ryan.github.view.FastWebViewPool;
 import com.ryan.github.view.WebResource;
 import com.ryan.github.view.config.CacheConfig;
+import com.ryan.github.view.config.DefaultMimeTypeFilter;
 import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.cookie.CookieInterceptor;
 import com.ryan.github.view.cookie.CookieStrategy;
@@ -97,6 +98,7 @@ public class WebViewActivity extends AppCompatActivity {
         }
         CacheConfig config = new CacheConfig.Builder(this)
                 .setCacheDir(getCacheDir() + File.separator + "custom")
+                .setExtensionFilter(new CustomMimeTypeFilter())
                 .build();
         fastWebView.setCacheMode(FastCacheMode.FORCE, config);
         fastWebView.addResourceInterceptor(new ResourceInterceptor() {
@@ -201,6 +203,12 @@ public class WebViewActivity extends AppCompatActivity {
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
             Log.d(TAG, "white screen time: " + (SystemClock.uptimeMillis() - startTime));
+        }
+    }
+
+    public class CustomMimeTypeFilter extends DefaultMimeTypeFilter {
+        CustomMimeTypeFilter() {
+            addMimeType("text/html");
         }
     }
 }
