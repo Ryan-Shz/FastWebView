@@ -56,6 +56,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FastWebView.setDebug(true);
         LogUtils.d("------------- start once load -------------");
         startTime = SystemClock.uptimeMillis();
         initStartTime = SystemClock.uptimeMillis();

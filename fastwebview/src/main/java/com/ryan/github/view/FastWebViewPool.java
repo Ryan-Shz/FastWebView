@@ -29,15 +29,11 @@ public class FastWebViewPool {
         if (webView == null) {
             MutableContextWrapper wrapper = new MutableContextWrapper(context);
             webView = new FastWebView(wrapper);
-            if (BuildConfig.DEBUG) {
-                LogUtils.d("create new webview instance.");
-            }
+            LogUtils.d("create new webview instance.");
         } else {
             MutableContextWrapper wrapper = (MutableContextWrapper) webView.getContext();
             wrapper.setBaseContext(context);
-            if (BuildConfig.DEBUG) {
-                LogUtils.d("obtain webview instance from pool.");
-            }
+            LogUtils.d("obtain webview instance from pool.");
         }
         return webView;
     }
@@ -50,8 +46,6 @@ public class FastWebViewPool {
         MutableContextWrapper wrapper = (MutableContextWrapper) webView.getContext();
         wrapper.setBaseContext(wrapper.getApplicationContext());
         sPool.release(webView);
-        if (BuildConfig.DEBUG) {
-            LogUtils.d("release webview instance to pool.");
-        }
+        LogUtils.d("release webview instance to pool.");
     }
 }

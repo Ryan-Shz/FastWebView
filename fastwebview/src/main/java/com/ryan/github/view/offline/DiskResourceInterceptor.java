@@ -9,6 +9,7 @@ import com.ryan.github.view.utils.StreamUtils;
 import com.ryan.github.view.utils.lru.DiskLruCache;
 import com.ryan.github.view.utils.HeaderUtils;
 import com.ryan.github.view.utils.LogUtils;
+import com.ryan.github.view.webview.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -135,7 +136,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
         try {
             DiskLruCache.Editor editor = mDiskLruCache.edit(key);
             if (editor == null) {
-                LogUtils.e("Another edit is in progress!");
+                LogUtils.d("Another edit is in progress!");
                 return;
             }
             OutputStream metaOutput = editor.newOutputStream(ENTRY_META);
@@ -167,7 +168,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                 editor.commit();
             }
         } catch (IOException e) {
-            LogUtils.d("cache to disk failed. cause by: " + e.getMessage());
+            LogUtils.e("cache to disk failed. cause by: " + e.getMessage());
             try {
                 // clean the redundant data
                 mDiskLruCache.remove(key);

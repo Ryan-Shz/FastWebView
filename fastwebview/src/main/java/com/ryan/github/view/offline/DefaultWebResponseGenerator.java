@@ -57,7 +57,7 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
             return null;
         }
         if (resourceBytes.length == 0 && resource.getResponseCode() == 304) {
-            LogUtils.e("the response bytes can not be empty if we get 304.");
+            LogUtils.d("the response bytes can not be empty if we get 304.");
             return null;
         }
         InputStream bis = new ByteArrayInputStream(resourceBytes);

@@ -12,6 +12,7 @@ import com.ryan.github.view.config.CacheConfig;
 import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.cookie.FastCookieManager;
 import com.ryan.github.view.offline.ResourceInterceptor;
+import com.ryan.github.view.utils.LogUtils;
 
 /**
  * Created by Ryan
@@ -150,5 +151,9 @@ public class FastWebView extends WebView implements FastOpenApi {
 
     void setRecycled(boolean recycled) {
         this.mRecycled = recycled;
+    }
+
+    public static void setDebug(boolean debug) {
+        LogUtils.DEBUG = debug;
     }
 }

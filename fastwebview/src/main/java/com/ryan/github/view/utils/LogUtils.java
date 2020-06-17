@@ -9,12 +9,17 @@ import android.util.Log;
 public class LogUtils {
 
     private static final String TAG = "FastWebView";
+    public static boolean DEBUG = false;
 
     public static void d(String message) {
-        Log.d(TAG, message);
+        if (DEBUG) {
+            Log.d(TAG, message);
+        }
     }
 
     public static void e(String message) {
-        Log.e(TAG, message);
+        if (DEBUG) {
+            Log.e(TAG, message);
+        }
     }
 }
