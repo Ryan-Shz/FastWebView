@@ -50,7 +50,7 @@ fastWebView.setCacheMode(FastCacheMode.FORCE);
 到这里FastWebView已经成功接入，就可以正常使用了。
 
 > Tips：如果现有项目中有自定义的WebView，可将原本继承于原生WebView改为继承FastWebView。
-> FastWebView在未开启缓存模式的情况下对现有代码是0侵入的。`
+> FastWebView在未开启缓存模式的情况下对现有代码是0侵入的。
 
 ## 高级用法
 
