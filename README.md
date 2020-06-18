@@ -20,13 +20,12 @@ FastWebView通过自定义本地缓存的方式，突破原生WebView缓存限�
 ![实战数据](data.png)
 
 ## 特性
-1. 自定义本地缓存，突破原生webview缓存限制
-2. 提供默认、普通和强制三种缓存模式
-3. 提供资源拦截器支持自定义读取静态资源（比如读取assets/sdcard中的资源替换在线资源）
-4. 支持离线加载/预加载
-5. cookie自动缓存和发布
-6. 提供WebView缓存池
-7. 接入成本低
+1. 自定义本地缓存，提供多种缓存模式，突破原生webview缓存限制
+2. 提供资源拦截器支持自定义读取静态资源（比如读取assets/sdcard中的资源替换在线资源）
+3. 更方便的cookie管理（自动缓存和发布，且Cookie拦截器让Cookie添加或删除变得更简单）
+4. 支持离线加载和预加载
+5. 接入成本和侵入性低，很容易集成到现有项目
+6. 经过大型项目实战验证，功能稳定，且不断完善中
 
 ## Quick Start
 
@@ -49,6 +48,9 @@ fastWebView.setCacheMode(FastCacheMode.FORCE);
 ```
 
 到这里FastWebView已经成功接入，就可以正常使用了。
+
+> Tips：如果现有项目中有自定义的WebView，可将原本继承于原生WebView改为继承FastWebView。
+> FastWebView在未开启缓存模式的情况下对现有代码是0侵入的。`
 
 ## 高级用法
 
