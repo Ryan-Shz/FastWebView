@@ -14,16 +14,15 @@ public class HeaderUtils {
 
     public static Map<String, String> generateHeadersMap(Headers headers) {
         Map<String, String> headersMap = new HashMap<>();
-        int index = 0;
         for (String key : headers.names()) {
             StringBuilder values = new StringBuilder();
+            int index = 0;
             for (String value : headers.values(key)) {
                 values.append(value);
-                if (index++ > 0) {
-                    values.append(",");
+                if (++index > 0) {
+                    values.append(" ");
                 }
             }
-            index = 0;
             headersMap.put(key, values.toString());
         }
         return headersMap;
