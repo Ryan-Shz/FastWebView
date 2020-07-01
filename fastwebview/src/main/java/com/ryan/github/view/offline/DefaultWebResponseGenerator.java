@@ -49,9 +49,6 @@ public class DefaultWebResponseGenerator implements WebResourceResponseGenerator
         if (TextUtils.isEmpty(urlMime)) {
             return null;
         }
-        if (TextUtils.isEmpty(charset)) {
-            charset = "UTF-8";
-        }
         byte[] resourceBytes = resource.getOriginBytes();
         if (resourceBytes == null || resourceBytes.length < 0) {
             return null;
