@@ -30,7 +30,7 @@ public class OfflineServerImpl implements OfflineServer {
 
     private List<ResourceInterceptor> buildForceModeChain(Context context, CacheConfig cacheConfig) {
         if (mForceModeChainList == null) {
-            int interceptorsCount = 1 + getBaseInterceptorsCount();
+            int interceptorsCount = 3 + getBaseInterceptorsCount();
             List<ResourceInterceptor> interceptors = new ArrayList<>(interceptorsCount);
             if (mBaseInterceptorList != null && !mBaseInterceptorList.isEmpty()) {
                 interceptors.addAll(mBaseInterceptorList);
