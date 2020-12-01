@@ -11,6 +11,7 @@ import okhttp3.Cookie;
  * Created by Ryan
  * on 2019/10/29
  */
+@Deprecated
 public class SerializableCookie implements Serializable {
     private static final long serialVersionUID = 6374381828722046732L;
 

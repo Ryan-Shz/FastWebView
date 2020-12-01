@@ -176,22 +176,9 @@ fastWebView.addResourceInterceptor(new ResourceInterceptor() {
 });
 ```
 #### 3. Cookie选项
+FastWebView实现了Cookie数据的自动缓存和上传，并遵循HTTP中Cookie协议，无需任何开关控制。
 
-##### 3.1. Cookie缓存模式
-
-FastWebView实现了Cookie的自动缓存和上传，并提供了以下两种缓存模式：
-```
-CookieStrategy.MEMORY; // 内存缓存模式
-CookieStrategy.PERSISTENT; // 持久缓存模式
-```
-可以通过以下方式来设置Cookie缓存模式：
-
-```
-FastCookieManager cookieManager = fastView.getFastCookieManager();
-cookieManager.setCookieStrategy(CookieStrategy strategy);
-```
-
-##### 3.2. Cookie拦截器
+##### Cookie拦截器
 
 Cookie拦截器用来拦截请求和响应获取到的Cookie列表，从而实现添加自定义Cookie的功能：
 ```
@@ -199,6 +186,10 @@ FastCookieManager cookieManager = fastView.getFastCookieManager();
 cookieManager.addRequestCookieInterceptor(CookieInterceptor interceptor);
 cookieManager.addResponseCookieInterceptor(CookieInterceptor interceptor);
 ```
+> 注意: FastWebView会使用原生WebView的Cookie数据源，并在内部做好数据同步。
+>
+> 所以完全不必担心 **CookieInterceptor** 会和 **原生的CookieManager** 之间存在数据不同步的问题。
+
 #### 4. 执行JS脚本
 
 ```

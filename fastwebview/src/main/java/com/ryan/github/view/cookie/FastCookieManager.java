@@ -4,6 +4,10 @@ import android.content.Context;
 
 import com.ryan.github.view.offline.Destroyable;
 
+import java.net.CookieStore;
+import java.util.ArrayList;
+import java.util.List;
+
 import okhttp3.CookieJar;
 
 /**
@@ -12,20 +16,19 @@ import okhttp3.CookieJar;
  */
 public class FastCookieManager implements Destroyable {
 
-    private CookieInterceptor requestCookieInterceptor;
-    private CookieInterceptor responseCookieInterceptor;
-    private CookieStrategy cookieStrategy;
+    private List<CookieInterceptor> mRequestCookieInterceptors;
+    private List<CookieInterceptor> mResponseCookieInterceptors;
     private CookieJar mUserCookieJar;
 
     private FastCookieManager() {
-
+        mRequestCookieInterceptors = new ArrayList<>();
+        mResponseCookieInterceptors = new ArrayList<>();
     }
 
     @Override
     public void destroy() {
-        requestCookieInterceptor = null;
-        responseCookieInterceptor = null;
-        cookieStrategy = null;
+        mRequestCookieInterceptors.clear();
+        mResponseCookieInterceptors.clear();
         mUserCookieJar = null;
     }
 
@@ -37,45 +40,32 @@ public class FastCookieManager implements Destroyable {
         return SingletonHolder.INSTANCE;
     }
 
-    CookieInterceptor getRequestCookieInterceptor() {
-        return requestCookieInterceptor;
+    List<CookieInterceptor> getRequestCookieInterceptors() {
+        return mRequestCookieInterceptors;
     }
 
-    public void setRequestCookieInterceptor(CookieInterceptor requestCookieInterceptor) {
-        this.requestCookieInterceptor = requestCookieInterceptor;
+    public void addRequestCookieInterceptor(CookieInterceptor requestCookieInterceptor) {
+        if (!mRequestCookieInterceptors.contains(requestCookieInterceptor)) {
+            mRequestCookieInterceptors.add(requestCookieInterceptor);
+        }
     }
 
-    CookieInterceptor getResponseCookieInterceptor() {
-        return responseCookieInterceptor;
+    List<CookieInterceptor> getResponseCookieInterceptors() {
+        return mResponseCookieInterceptors;
     }
 
-    public void setResponseCookieInterceptor(CookieInterceptor responseCookieInterceptor) {
-        this.responseCookieInterceptor = responseCookieInterceptor;
-    }
-
-    public void setCookieStrategy(CookieStrategy cookieStrategy) {
-        this.cookieStrategy = cookieStrategy;
-    }
-
-    public CookieStrategy getCookieStrategy() {
-        return cookieStrategy;
+    public void addResponseCookieInterceptor(CookieInterceptor responseCookieInterceptor) {
+        if (!mResponseCookieInterceptors.contains(responseCookieInterceptor)) {
+            mResponseCookieInterceptors.add(responseCookieInterceptor);
+        }
     }
 
     public CookieJar getCookieJar(Context context) {
-        return mUserCookieJar != null ? mUserCookieJar : new CookieJarImpl(getCookieStore(context));
+        return mUserCookieJar != null ? mUserCookieJar : new CookieJarImpl();
     }
 
     public void setCookieJar(CookieJar cookieJar) {
         this.mUserCookieJar = cookieJar;
     }
 
-    private CookieStore getCookieStore(Context context) {
-        CookieStore cookieStore;
-        if (getCookieStrategy() == CookieStrategy.PERSISTENT) {
-            cookieStore = new PersistentCookieStore(context);
-        } else {
-            cookieStore = new MemoryCookieStore();
-        }
-        return cookieStore;
-    }
 }

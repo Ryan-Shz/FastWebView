@@ -9,6 +9,7 @@ import okhttp3.HttpUrl;
  * Created by Ryan
  * on 2019/10/29
  */
+@Deprecated
 public interface CookieStore {
 
     void add(HttpUrl httpUrl, Cookie cookie);

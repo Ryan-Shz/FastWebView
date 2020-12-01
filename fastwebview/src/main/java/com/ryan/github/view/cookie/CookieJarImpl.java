@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Cookie;
@@ -16,30 +17,31 @@ import okhttp3.HttpUrl;
  */
 public class CookieJarImpl implements CookieJar {
 
-    private CookieStore mCookieStore;
     private FastCookieManager mCookieManager;
 
-    public CookieJarImpl(CookieStore cookieStore) {
-        if (cookieStore == null) {
-            throw new IllegalArgumentException("cookieStore can not be null.");
-        }
+    public CookieJarImpl() {
         mCookieManager = FastCookieManager.getInstance();
-        mCookieStore = cookieStore;
     }
 
     @Override
     public synchronized void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-        CookieInterceptor interceptor = mCookieManager.getResponseCookieInterceptor();
-        if (interceptor != null) {
-            cookies = interceptor.newCookies(url, cookies);
+        List<CookieInterceptor> interceptors = mCookieManager.getRequestCookieInterceptors();
+        if (interceptors != null && !interceptors.isEmpty()) {
+            for (CookieInterceptor interceptor : interceptors) {
+                cookies = interceptor.newCookies(url, cookies);
+            }
         }
-        mCookieStore.add(url, cookies);
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        for (Cookie cookie : cookies) {
+            cookieManager.setCookie(url.toString(), cookie.toString());
+        }
     }
 
     @NonNull
     @Override
     public synchronized List<Cookie> loadForRequest(HttpUrl url) {
-        List<Cookie> cookies = mCookieStore.get(url);
+        List<Cookie> cookies = new ArrayList<>();
         String cookieFullStr = CookieManager.getInstance().getCookie(url.host());
         if (!TextUtils.isEmpty(cookieFullStr)) {
             String[] cookieArr = cookieFullStr.split(";");
@@ -50,9 +52,11 @@ public class CookieJarImpl implements CookieJar {
                 }
             }
         }
-        CookieInterceptor interceptor = mCookieManager.getRequestCookieInterceptor();
-        if (interceptor != null) {
-            cookies = interceptor.newCookies(url, cookies);
+        List<CookieInterceptor> interceptors = mCookieManager.getResponseCookieInterceptors();
+        if (interceptors != null && !interceptors.isEmpty()) {
+            for (CookieInterceptor interceptor : interceptors) {
+                cookies = interceptor.newCookies(url, cookies);
+            }
         }
         return cookies;
     }

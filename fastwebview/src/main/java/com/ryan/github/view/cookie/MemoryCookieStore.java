@@ -13,6 +13,7 @@ import okhttp3.HttpUrl;
  * Created by Ryan
  * on 2019/10/29
  */
+@Deprecated
 public class MemoryCookieStore implements CookieStore {
 
     private static final String HOST_NAME_PREFIX = "host_";

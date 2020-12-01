@@ -25,7 +25,6 @@ import com.ryan.github.view.config.CacheConfig;
 import com.ryan.github.view.config.DefaultMimeTypeFilter;
 import com.ryan.github.view.config.FastCacheMode;
 import com.ryan.github.view.cookie.CookieInterceptor;
-import com.ryan.github.view.cookie.CookieStrategy;
 import com.ryan.github.view.cookie.FastCookieManager;
 import com.ryan.github.view.offline.Chain;
 import com.ryan.github.view.offline.ResourceInterceptor;
@@ -122,8 +121,7 @@ public class WebViewActivity extends AppCompatActivity {
         CookieSyncManager.getInstance().sync();
 
         FastCookieManager fastCookieManager = fastWebView.getFastCookieManager();
-        fastCookieManager.setCookieStrategy(CookieStrategy.PERSISTENT);
-        fastCookieManager.setRequestCookieInterceptor(new CookieInterceptor() {
+        fastCookieManager.addRequestCookieInterceptor(new CookieInterceptor() {
             @Override
             public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
                 for (Cookie cookie : originCookies) {
@@ -132,7 +130,7 @@ public class WebViewActivity extends AppCompatActivity {
                 return originCookies;
             }
         });
-        fastCookieManager.setResponseCookieInterceptor(new CookieInterceptor() {
+        fastCookieManager.addResponseCookieInterceptor(new CookieInterceptor() {
             @Override
             public List<Cookie> newCookies(HttpUrl url, List<Cookie> originCookies) {
                 for (Cookie cookie : originCookies) {

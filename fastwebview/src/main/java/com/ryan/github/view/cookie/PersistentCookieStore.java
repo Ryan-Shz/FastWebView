@@ -24,6 +24,7 @@ import okhttp3.HttpUrl;
  * Created by Ryan
  * on 2019/10/29
  */
+@Deprecated
 public class PersistentCookieStore implements CookieStore {
 
     private static final String LOG_TAG = PersistentCookieStore.class.getSimpleName();
