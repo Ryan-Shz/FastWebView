@@ -151,6 +151,7 @@ fastWebView.setCacheConfig(new CacheConfig.Builder()
 
 所以如果需要更新静态资源文件，需要和前端达成约定一致，当静态资源更新时，保证静态资源url地址发生改变。url变化后，FastWebView会重新从网络下载。
 
+> 实际上，目前的工程实践中，前端项目一般使用webpack构建。webpack在构建成功后会自动对文件加上hash，在文件变更后hash也会自动变化。这种特性让FastWebView可以轻松的识别静态文件变化，从而实现自动更新。
 #### 资源加载拦截器
 
 > 注意：ResourceInterceptor只对NORMAL和FORCE两种缓存模式生效。
