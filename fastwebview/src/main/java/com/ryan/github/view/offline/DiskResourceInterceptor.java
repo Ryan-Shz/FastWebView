@@ -91,6 +91,7 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
                     webResource.setModified(false);
                     return webResource;
                 }
+                snapshot.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,9 +165,9 @@ public class DiskResourceInterceptor implements Destroyable, ResourceInterceptor
             if (originBytes != null && originBytes.length > 0) {
                 sink.write(originBytes);
                 sink.flush();
-                sink.close();
                 editor.commit();
             }
+            sink.close();
         } catch (IOException e) {
             LogUtils.e("cache to disk failed. cause by: " + e.getMessage());
             try {

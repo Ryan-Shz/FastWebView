@@ -19,6 +19,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
 
 import static android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK;
 import static android.webkit.WebSettings.LOAD_CACHE_ONLY;
@@ -84,7 +85,7 @@ public class OkHttpResourceLoader implements ResourceLoader {
                 .cacheControl(cacheControl)
                 .get()
                 .build();
-        Response response;
+        Response response = null;
         try {
             WebResource remoteResource = new WebResource();
             response = client.newCall(request).execute();
@@ -102,6 +103,10 @@ public class OkHttpResourceLoader implements ResourceLoader {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
         return null;
     }
